@@ -1,0 +1,56 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Configurações e restrições alimentares do usuário",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "dietaryRestrictions": { "type": "array" },
+        "targetCalories": { "type": "number" },
+        "targetProtein": { "type": "number" },
+        "targetCarbs": { "type": "number" },
+        "targetFat": { "type": "number" },
+        "targetSodium": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "email", "dietaryRestrictions"]
+    },
+    "ProductScan": {
+      "title": "ProductScan",
+      "description": "Leitura e análise nutricional de produto por IA",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "barcode": { "type": "string" },
+        "productName": { "type": "string" },
+        "brand": { "type": "string" },
+        "servingSize": { "type": "string" },
+        "healthScore": { "type": "number" },
+        "nutriScore": { "type": "string" },
+        "novaGroup": { "type": "number" },
+        "macronutrients": { "type": "object" },
+        "ingredientsText": { "type": "string" },
+        "beneficialSubstances": { "type": "array" },
+        "harmfulSubstances": { "type": "array" },
+        "additives": { "type": "array" },
+        "triggeredAlerts": { "type": "array" },
+        "scannedAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "productName", "healthScore", "nutriScore"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Perfis de usuários"
+    },
+    "/scans/{scanId}": {
+      "schema": "ProductScan",
+      "description": "Histórico global de rótulos escaneados"
+    }
+  }
+}
