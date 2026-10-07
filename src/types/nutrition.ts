@@ -39,6 +39,7 @@ export interface ProductScan {
   brand: string;
   imageUrl?: string;
   servingSize: string;
+  tacoReference?: string;
   healthScore: number; // 0 to 100
   nutriScore: NutriScoreGrade;
   novaGroup: 1 | 2 | 3 | 4;

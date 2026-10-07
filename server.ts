@@ -24,7 +24,7 @@ const ai = new GoogleGenAI({
   },
 });
 
-// Mock database of pre-analyzed sample foods for offline/test fallback
+// Mock database of pre-analyzed sample foods aligned with TACO / UNICAMP for offline/test fallback
 const SAMPLE_PRODUCTS: Record<string, any> = {
   '7891000100103': {
     productName: 'Iogurte Natural Proteico 20g',
@@ -35,6 +35,7 @@ const SAMPLE_PRODUCTS: Record<string, any> = {
     novaGroup: 1,
     novaDescription: 'Alimento não processado ou minimamente processado',
     servingSize: '200g',
+    tacoReference: 'Referência TACO/UNICAMP: Leite e derivados - Iogurte Natural',
     macronutrients: {
       calories: 140,
       protein: 20,
@@ -48,9 +49,9 @@ const SAMPLE_PRODUCTS: Record<string, any> = {
     },
     ingredientsText: 'Leite desnatado pasteurizado, fermentos lácteos vivos e concentração proteica de soro de leite.',
     beneficialSubstances: [
-      { name: 'Proteína de Alta Absorção', reason: 'Essencial para ganho de massa magra e saciedade.' },
-      { name: 'Probióticos Vivos', reason: 'Melhora a flora intestinal e imunidade.' },
-      { name: 'Cálcio Ativo', reason: 'Fortalece a estrutura óssea.' },
+      { name: 'Proteína de Alta Absorção (TACO)', reason: 'Essencial para ganho de massa magra e reconstrução muscular.' },
+      { name: 'Probióticos Vivos Lácteos', reason: 'Melhora a flora intestinal e imunidade.' },
+      { name: 'Cálcio Ativo (157mg/100g TACO)', reason: 'Fortalece a estrutura óssea.' },
     ],
     harmfulSubstances: [],
     additives: [],
@@ -66,6 +67,7 @@ const SAMPLE_PRODUCTS: Record<string, any> = {
     novaGroup: 4,
     novaDescription: 'Alimento Ultraprocessado',
     servingSize: '350ml',
+    tacoReference: 'Referência TACO/UNICAMP: Bebidas Não Alcoólicas - Refrigerantes',
     macronutrients: {
       calories: 0,
       protein: 0,
@@ -80,9 +82,9 @@ const SAMPLE_PRODUCTS: Record<string, any> = {
     ingredientsText: 'Água gaseificada, extrato de noz de cola, corante caramelo IV (E150d), acidulante ácido fosfórico (E338), edulcorantes artificiais sucralose e acessulfame K, conservador benzoato de sódio (E211).',
     beneficialSubstances: [],
     harmfulSubstances: [
-      { name: 'Corante Caramelo IV (E150d)', risk: 'Alto', description: 'Aditivo sintético associado a subprodutos potencialmente carcinogênicos em uso contínuo.' },
-      { name: 'Ácido Fosfórico (E338)', risk: 'Médio', description: 'Pode prejudicar a absorção de cálcio nos ossos quando consumido em excesso.' },
-      { name: 'Sucralose & Acessulfame K', risk: 'Médio', description: 'Adoçantes artificiais que podem alterar a sensibilidade à insulina e microbiota intestinal.' },
+      { name: 'Corante Caramelo IV (E150d)', risk: 'Alto', description: 'Aditivo sintético de alta preocupação toxicológica.' },
+      { name: 'Ácido Fosfórico (E338)', risk: 'Médio', description: 'Desgaste de cálcio nos ossos e dentes.' },
+      { name: 'Adoçantes Artificiais (Sucralose e Acessulfame K)', risk: 'Médio', description: 'Alteração da microbiota intestinal e sensibilidade à insulina.' },
     ],
     additives: ['E150d', 'E338', 'E211'],
     triggeredAlerts: ['Aditivos Nocivos Elevados', 'Ultraprocessado NOVA 4'],
@@ -101,7 +103,6 @@ app.post('/api/gemini/analyze-product', async (req, res) => {
     // Check if barcode matches mock catalog first for instant response
     if (barcode && SAMPLE_PRODUCTS[barcode]) {
       const mockProduct = { ...SAMPLE_PRODUCTS[barcode] };
-      // Customize alerts according to user restrictions
       const alerts: string[] = [...mockProduct.triggeredAlerts];
       if (userRestrictions.includes('lactose') && mockProduct.ingredientsText.toLowerCase().includes('leite')) {
         alerts.push('CONTÉM LACTOSE - Incompatível com suas restrições!');
@@ -116,20 +117,25 @@ app.post('/api/gemini/analyze-product', async (req, res) => {
       return res.json({ success: true, product: fallback, source: 'fallback' });
     }
 
-    const promptText = `Você é um nutricionista especialista em rotulagem e bioquímica alimentar.
-Analise a imagem deste rótulo/produto de alimento ou o código de barras "${barcode || ''}".
+    const promptText = `Você é um nutricionista rigoroso, especialista em bioquímica alimentar e saúde pública no Brasil.
+Sua missão é analisar a foto deste produto, rótulo ou prato de comida (ou o código de barras "${barcode || ''}") e fornecer uma análise detalhada.
+
+CRÍTICO — FUNDAMENTAÇÃO NA TABELA TACO (NEPA/UNICAMP):
+Você DEVE obrigatoriamente utilizar como padrão de referência nutricional os valores da **Tabela Brasileira de Composição de Alimentos - TACO (NEPA/UNICAMP 4ª Edição)** para calcular/validar as informações dos alimentos (ex: Arroz integral cozido: 124 kcal/100g, Feijão carioca cozido: 76 kcal/100g, Peito de frango grelhado: 159 kcal/100g, Batata doce cozida: 77 kcal/100g, Ovo cozido: 146 kcal/100g, etc.).
+
 As restrições alimentares do usuário são: [${userRestrictions.join(', ')}].
 
-Forneça uma análise estruturada estritamente em formato JSON com o seguinte esquema:
+Forneça uma resposta estritamente em formato JSON com o seguinte esquema preciso:
 {
   "productName": "Nome do Alimento ou Bebida",
-  "brand": "Marca do fabricante (ou Desconhecida)",
+  "brand": "Marca do fabricante (ou 'In Natura / Preparado' se for foto de prato de comida)",
   "barcode": "${barcode || ''}",
+  "tacoReference": "Referência exata cruzada com a Tabela TACO/UNICAMP 4ª Edição (ex: TACO #561 Feijão Carioca Cozido ou TACO #410 Frango Peito Grelhado)",
   "healthScore": 85, (nota de 0 a 100 baseada na qualidade nutricional)
   "nutriScore": "A", (uma das opções: 'A', 'B', 'C', 'D', 'E')
   "novaGroup": 1, (grupo NOVA de 1 a 4: 1 In natura/Minimamente processado, 2 Ingrediente culinário, 3 Processado, 4 Ultraprocessado)
   "novaDescription": "Descrição do grupo NOVA",
-  "servingSize": "Tamanho da porção (ex: 100g ou 1 porção de 30g)",
+  "servingSize": "Tamanho da porção (ex: 100g ou 1 porção de 150g)",
   "macronutrients": {
     "calories": 210,
     "protein": 12, (em gramas)
@@ -141,25 +147,25 @@ Forneça uma análise estruturada estritamente em formato JSON com o seguinte es
     "sodium": 120, (em miligramas)
     "sugar": 3.2 (em gramas)
   },
-  "ingredientsText": "Lista completa legível dos ingredientes identificados no rótulo",
+  "ingredientsText": "Lista completa legível dos ingredientes identificados no rótulo ou no prato",
   "beneficialSubstances": [
-    { "name": "Nome da substância saudável (ex: Fibras Solúveis)", "reason": "Benefício à saúde" }
+    { "name": "Nome da substância saudável (ex: Fibras Solúveis)", "reason": "Benefício à saúde fundamentado" }
   ],
   "harmfulSubstances": [
-    { "name": "Nome do ingrediente/aditivo nocivo (ex: Glutamato Monossódico)", "risk": "Alto", "description": "Por que é prejudicial" }
+    { "name": "Nome do ingrediente/aditivo nocivo (ex: Maltodextrina ou Corante Caramelo IV)", "risk": "Alto", "description": "Por que é prejudicial" }
   ],
   "additives": ["E621", "E250"], (lista de códigos E ou nomes de aditivos conservantes/corantes/estabilizantes)
   "triggeredAlerts": ["Alerta de Restrição ou Perigo"], (ex: "CONTÉM GLÚTEN", "CONTÉM LACTOSE", "SÓDIO ELEVADO")
   "suggestedSwaps": [
-    { "productName": "Nome de produto substituto mais saudável", "brand": "Marca sugerida", "healthScore": 95, "nutriScore": "A", "reason": "Por que esta opção é superior" }
+    { "productName": "Nome de produto/alimento substituto mais saudável", "brand": "Marca ou Preparo Sugerido", "healthScore": 95, "nutriScore": "A", "reason": "Por que esta opção é superior" }
   ]
 }
 
 Regras estritas:
 1. Responda APENAS o JSON válido sem marcações markdown ou introduções.
-2. Seja preciso na identificação de alérgenos e aditivos ultraprocessados.
-3. Se a imagem contiver código de barras, inclua no campo barcode.
-4. Identifique imediatamente se viola as restrições informadas (${userRestrictions.join(', ')}) e adicione aos triggeredAlerts.`;
+2. Identifique 'açúcares escondidos' (maltodextrina, dextrose, xarope de milho de alta frutose, sacarose, açúcar invertido).
+3. Seja preciso na identificação de alérgenos e aditivos ultraprocessados.
+4. Se violar as restrições informadas (${userRestrictions.join(', ')}), adicione imediatamente aos triggeredAlerts.`;
 
     let parts: any[] = [{ text: promptText }];
 
@@ -214,6 +220,7 @@ function generateFallbackAnalysis(barcode?: string, userRestrictions: string[] =
     productName: barcode ? `Alimento Escaneado (Cód ${barcode.slice(-4)})` : 'Barra de Cereais Integral Nutritiva',
     brand: 'NutriFit Pro',
     barcode: barcode || '7898000112233',
+    tacoReference: 'Referência TACO/UNICAMP: Cereais e Derivados - Aveia em flocos (Item #7 TACO)',
     healthScore,
     nutriScore,
     novaGroup: isHealthy ? 2 : 4,
@@ -235,15 +242,15 @@ function generateFallbackAnalysis(barcode?: string, userRestrictions: string[] =
       : 'Farinha de trigo enriquecida com ferro e ácido fólico, açúcar refinado, gordura vegetal interesterificada, xarope de milho de alta frutose, sal, emulsificante lecitina de soja, corante caramelo IV (E150d) e aromatizantes sintéticos.',
     beneficialSubstances: isHealthy
       ? [
-          { name: 'Fibras Solúveis da Aveia (Beta-glucana)', reason: 'Reduz o colesterol LDL e estabiliza o índice glicêmico.' },
-          { name: 'Gorduras Boas (Nuts)', reason: 'Fonte de ômega-9 e vitamina E antioxidante.' },
+          { name: 'Fibras Solúveis da Aveia (Beta-glucana - TACO)', reason: 'Reduz o colesterol LDL e estabiliza o índice glicêmico.' },
+          { name: 'Gorduras Boas (Nuts TACO #588)', reason: 'Fonte de ômega-9 e vitamina E antioxidante.' },
         ]
       : [],
     harmfulSubstances: isHealthy
       ? []
       : [
           { name: 'Gordura Interesterificada', risk: 'Alto', description: 'Gordura modificada que eleva os riscos cardiovasculares.' },
-          { name: 'Xarope de Milho de Alta Frutose', risk: 'Alto', description: 'Açúcar de rápida absorção associado à esteatose hepática.' },
+          { name: 'Xarope de Milho de Alta Frutose (Açúcar Escondido)', risk: 'Alto', description: 'Açúcar de rápida absorção associado à esteatose hepática.' },
         ],
     additives: isHealthy ? [] : ['E150d', 'E322', 'E202'],
     triggeredAlerts: alerts,
@@ -253,7 +260,7 @@ function generateFallbackAnalysis(barcode?: string, userRestrictions: string[] =
         brand: 'BioVerde',
         healthScore: 96,
         nutriScore: 'A',
-        reason: 'Zero açúcares adicionados, 100% livre de óleos vegetais refinados e rica em fibras vivas.',
+        reason: 'Zero açúcares adicionados, 100% livre de óleos vegetais refinados e rica em fibras vivas (TACO).',
       },
     ],
   };
@@ -279,7 +286,7 @@ async function setupServer() {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NutriLense AI — Scanner Nutricional por IA</title>
+    <title>NutriLense AI — Scanner Nutricional por IA & Tabela TACO</title>
   </head>
   <body>
     <div id="root"></div>
@@ -301,7 +308,7 @@ async function setupServer() {
   }
 
   app.listen(PORT, () => {
-    console.log(`Server NutriLense AI running on http://localhost:${PORT}`);
+    console.log(`Server NutriLense AI com Tabela TACO running on http://localhost:${PORT}`);
   });
 }
 

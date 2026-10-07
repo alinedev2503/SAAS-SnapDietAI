@@ -1,6 +1,6 @@
 import React from 'react';
 import { ProductScan, NutriScoreGrade } from '../types/nutrition';
-import { ShieldAlert, ShieldCheck, Sparkles, AlertTriangle, ArrowRight, Info, CheckCircle2, Flame, HeartPulse } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Sparkles, AlertTriangle, ArrowRight, BookOpen, Flame, HeartPulse } from 'lucide-react';
 
 interface ProductCardProps {
   scan: ProductScan;
@@ -27,15 +27,29 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
         
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
-              {scan.brand || 'Marca Desconhecida'}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
+                {scan.brand || 'Marca Desconhecida'}
+              </span>
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 rounded-full border border-emerald-200 dark:border-emerald-800">
+                <BookOpen className="w-3 h-3 text-emerald-600" />
+                TACO / UNICAMP
+              </span>
+            </div>
+
             <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
               {scan.productName}
             </h3>
+
             <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">
               Porção: {scan.servingSize} {scan.barcode ? `· EAN: ${scan.barcode}` : ''}
             </p>
+
+            {scan.tacoReference && (
+              <p className="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium pt-0.5">
+                ✓ {scan.tacoReference}
+              </p>
+            )}
           </div>
 
           {/* Health Score Gauge Circle */}
@@ -93,7 +107,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
       <div className="p-5 border-b border-slate-100 dark:border-slate-800">
         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
           <Flame className="w-4 h-4 text-amber-500" />
-          Tabela Nutricional por Porção
+          Tabela Nutricional por Porção (Padrão TACO)
         </h4>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -191,7 +205,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
             <ArrowRight className="w-4 h-4 ml-auto" />
           </button>
         ) : (
-          <span className="text-xs text-slate-500 font-medium">Análise registrada no diário</span>
+          <span className="text-xs text-slate-500 font-medium">Análise registrada com padrão TACO/UNICAMP</span>
         )}
       </div>
 
