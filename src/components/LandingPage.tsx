@@ -1,5 +1,31 @@
 import React, { useState } from 'react';
-import { Camera, Sparkles, ShieldCheck, FileBarChart, Check, ArrowRight, HeartPulse, AlertTriangle, Scale, RefreshCw, Smartphone, Award, HelpCircle } from 'lucide-react';
+import {
+  Camera,
+  Sparkles,
+  ShieldCheck,
+  FileBarChart,
+  Check,
+  ArrowRight,
+  HeartPulse,
+  AlertTriangle,
+  Scale,
+  RefreshCw,
+  Smartphone,
+  Award,
+  HelpCircle,
+  CreditCard,
+  Lock,
+  Loader2,
+  CheckCircle2,
+  Sliders,
+  Database,
+  Zap,
+  BarChart3,
+  Layers,
+  Code2,
+  ExternalLink,
+  ChevronRight,
+} from 'lucide-react';
 import { useWhiteLabel } from '../context/WhiteLabelContext';
 
 interface LandingPageProps {
@@ -8,10 +34,43 @@ interface LandingPageProps {
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavigateToTab }) => {
-  const { config } = useWhiteLabel();
+  const { config, currentPlan, setPlan, subscribeStripePlan } = useWhiteLabel();
 
   // Interactive comparison widget state
   const [activeDemo, setActiveDemo] = useState<'soda' | 'yogurt'>('soda');
+  const [subscribingPlan, setSubscribingPlan] = useState<'pro' | 'plus' | null>(null);
+  const [stripeNotification, setStripeNotification] = useState<string | null>(null);
+  const [showStripeSpecs, setShowStripeSpecs] = useState<boolean>(false);
+  const [isSyncingStripe, setIsSyncingStripe] = useState<boolean>(false);
+  const [stripeSyncResult, setStripeSyncResult] = useState<any>(null);
+  const [weeklyUsageEstimate, setWeeklyUsageEstimate] = useState<number>(5);
+
+  const handleSubscribe = async (plan: 'pro' | 'plus') => {
+    setSubscribingPlan(plan);
+    setStripeNotification(null);
+    try {
+      const res = await subscribeStripePlan(plan);
+      if (res.message) {
+        setStripeNotification(res.message);
+        setTimeout(() => setStripeNotification(null), 5000);
+      }
+    } finally {
+      setSubscribingPlan(null);
+    }
+  };
+
+  const handleSyncStripeProduct = async () => {
+    setIsSyncingStripe(true);
+    try {
+      const response = await fetch('/api/stripe/provision-product', { method: 'POST' });
+      const data = await response.json();
+      setStripeSyncResult(data);
+    } catch (err: any) {
+      setStripeSyncResult({ success: false, message: err.message });
+    } finally {
+      setIsSyncingStripe(false);
+    }
+  };
 
   return (
     <div className="space-y-16 sm:space-y-24 pb-12">
@@ -313,61 +372,380 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
         </div>
       </section>
 
-      {/* Pricing Table Section */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 text-center">
-        <div className="space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Planos & Acesso</span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Escolha o plano ideal para a sua rotina</h2>
+      {/* Pricing Table Section — NutriLense AI on Stripe */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 space-y-10 text-center">
+        
+        {/* Header & Value Proposition */}
+        <div className="space-y-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold text-emerald-700 dark:text-emerald-300">
+            <Lock className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Stripe Checkout Oficial • Produto NutriLense AI</span>
+          </div>
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            Planos Transparentes & Cota Inteligente de Leituras
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            Comece na degustação gratuita com 2 scans, escolha o <strong>Plano Pro</strong> com cota de 20 scans no mês para compras rotineiras ou libere <strong>Scans Ilimitados no Plano Plus</strong> por R$ 49,90/mês.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left max-w-3xl mx-auto">
-          
-          <div className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-            <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Plano Gratuito</h3>
-              <p className="text-xs text-slate-500">Ideal para degustar o scanner no dia a dia</p>
-            </div>
-            <div className="text-3xl font-extrabold text-slate-900 dark:text-white font-mono">
-              R$ 0 <span className="text-xs font-normal text-slate-500">/mês</span>
-            </div>
-            <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-2">
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> 2 Scans gratuitos por sessão</li>
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> Alertas de restrições de saúde</li>
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> Classificação NutriScore Básica</li>
-            </ul>
-            <button
-              onClick={onOpenScanner}
-              className="w-full py-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs rounded-xl hover:opacity-90 transition-opacity cursor-pointer"
-            >
-              Testar Agora
-            </button>
+        {/* Stripe Notification banner */}
+        {stripeNotification && (
+          <div className="max-w-lg mx-auto p-4 bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-700 rounded-2xl text-xs font-semibold text-emerald-900 dark:text-emerald-100 flex items-center justify-center gap-2.5 shadow-md animate-fade-in">
+            <CheckCircle2 className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
+            <span>{stripeNotification}</span>
           </div>
+        )}
 
-          <div className="p-6 bg-emerald-600 text-white rounded-3xl shadow-xl space-y-4 relative overflow-hidden">
-            <span className="absolute top-4 right-4 px-2.5 py-1 bg-white/20 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
-              Popular
+        {/* Interactive Usage & Quota Simulator */}
+        <div className="max-w-3xl mx-auto p-4 sm:p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
+              <Scale className="w-4 h-4 text-emerald-600" />
+              <span>Simulador de Uso no Supermercado:</span>
+            </div>
+            <span className="text-[11px] font-medium text-slate-500">
+              {weeklyUsageEstimate <= 2 && 'Degustação rápida'}
+              {weeklyUsageEstimate > 2 && weeklyUsageEstimate <= 5 && 'Perfil Compras Semanais (~20 scans/mês)'}
+              {weeklyUsageEstimate > 5 && 'Perfil Diário / Família / Dieta Ativa (>20 scans/mês)'}
             </span>
-            <div>
-              <h3 className="text-lg font-bold">Plano Pro Ilimitado</h3>
-              <p className="text-xs text-emerald-100">Scans ilimitados, relatórios PDF e trocas por IA</p>
-            </div>
-            <div className="text-3xl font-extrabold font-mono">
-              R$ 19,90 <span className="text-xs font-normal text-emerald-200">/mês</span>
-            </div>
-            <ul className="text-xs text-emerald-50 space-y-2">
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-white" /> Scans de câmera e código de barras ilimitados</li>
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-white" /> Relatórios mensais exportáveis em PDF</li>
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-white" /> Sugestões inteligentes de substituição saudável</li>
-            </ul>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
             <button
-              onClick={onOpenScanner}
-              className="w-full py-3 bg-white text-emerald-800 font-bold text-xs rounded-xl hover:bg-emerald-50 transition-colors cursor-pointer shadow-md"
+              onClick={() => setWeeklyUsageEstimate(1)}
+              className={`p-2.5 rounded-xl text-xs font-semibold border transition-all text-center cursor-pointer ${
+                weeklyUsageEstimate <= 2
+                  ? 'border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 shadow-sm'
+                  : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+              }`}
             >
-              Começar Acesso Pro
+              <div className="font-bold text-sm">2 Scans</div>
+              <div className="text-[10px] opacity-80">Degustação</div>
+            </button>
+
+            <button
+              onClick={() => setWeeklyUsageEstimate(5)}
+              className={`p-2.5 rounded-xl text-xs font-semibold border transition-all text-center cursor-pointer ${
+                weeklyUsageEstimate > 2 && weeklyUsageEstimate <= 5
+                  ? 'border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 shadow-sm'
+                  : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+              }`}
+            >
+              <div className="font-bold text-sm">20 Scans/mês</div>
+              <div className="text-[10px] opacity-80">Recomendado: Pro</div>
+            </button>
+
+            <button
+              onClick={() => setWeeklyUsageEstimate(10)}
+              className={`p-2.5 rounded-xl text-xs font-semibold border transition-all text-center cursor-pointer ${
+                weeklyUsageEstimate > 5
+                  ? 'border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 shadow-sm'
+                  : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+              }`}
+            >
+              <div className="font-bold text-sm">Ilimitado</div>
+              <div className="text-[10px] opacity-80">Recomendado: Plus</div>
+            </button>
+          </div>
+        </div>
+
+        {/* 3 Pricing Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-5xl mx-auto items-stretch">
+          
+          {/* Card 1: Plano Gratuito */}
+          <div className={`p-6 sm:p-7 bg-white dark:bg-slate-900 rounded-3xl border transition-all flex flex-col justify-between ${
+            currentPlan === 'free'
+              ? 'border-slate-400 ring-2 ring-slate-300 dark:ring-slate-700 shadow-md'
+              : 'border-slate-200/90 dark:border-slate-800 shadow-sm hover:border-slate-300'
+          }`}>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Degustação</span>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Gratuito</h3>
+                </div>
+                {currentPlan === 'free' ? (
+                  <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold rounded-full">
+                    Plano Ativo
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[10px] font-semibold rounded-full">
+                    Sem Cartão
+                  </span>
+                )}
+              </div>
+
+              <div className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-mono">
+                R$ 0,00 <span className="text-xs font-normal text-slate-500">/mês</span>
+              </div>
+              
+              <div className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-slate-500" />
+                <span>2 scans gratuitos de teste</span>
+              </div>
+
+              <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-2.5 pt-2">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>2 leituras completas de rótulos via câmera</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Detecção de açúcares ocultos e aditivos nocivos</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Alertas para lactose, glúten e sódio</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Fundamentação pela Tabela TACO (UNICAMP)</span>
+                </li>
+                <li className="flex items-start gap-2 text-slate-400 dark:text-slate-500">
+                  <span className="w-4 h-4 flex items-center justify-center font-bold text-[10px] text-slate-400">✕</span>
+                  <span>Sem histórico prolongado ou relatórios mensais</span>
+                </li>
+              </ul>
+            </div>
+
+            <button
+              onClick={() => {
+                setPlan('free');
+                onOpenScanner();
+              }}
+              className="mt-8 w-full py-3.5 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 text-white dark:text-slate-900 font-bold text-xs rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm"
+            >
+              <span>{currentPlan === 'free' ? 'Testar Scanner Grátis' : 'Voltar para Gratuito'}</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Card 2: Plano Pro (20 Scans no mês) */}
+          <div className={`p-6 sm:p-7 bg-white dark:bg-slate-900 rounded-3xl border transition-all flex flex-col justify-between relative ${
+            currentPlan === 'pro'
+              ? 'border-emerald-500 ring-2 ring-emerald-400 shadow-lg'
+              : 'border-slate-200/90 dark:border-slate-800 shadow-md hover:border-emerald-400'
+          }`}>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                    Compras da Semana
+                  </span>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Plano Pro</h3>
+                </div>
+                {currentPlan === 'pro' ? (
+                  <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full">
+                    Plano Ativo
+                  </span>
+                ) : (
+                  <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold rounded-full border border-emerald-200 dark:border-emerald-800">
+                    Cota Mensal
+                  </span>
+                )}
+              </div>
+
+              <div className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-mono">
+                R$ 24,90 <span className="text-xs font-normal text-slate-500">/mês</span>
+              </div>
+
+              {/* Destaque do Limite de 20 Scans */}
+              <div className="text-xs font-bold text-emerald-800 dark:text-emerald-200 bg-emerald-50 dark:bg-emerald-950/70 px-3 py-1.5 rounded-xl border border-emerald-300 dark:border-emerald-800 flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>Limite de 20 Scans no mês</span>
+              </div>
+
+              <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-2.5 pt-2">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span><strong>20 leituras de rótulos por mês</strong> (câmera & código de barras)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Mapeamento profundo de alérgenos e conservantes</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Diário alimentar com histórico de 30 dias</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Sugestão de substituições saudáveis por IA</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Geração de relatórios mensais em PDF</span>
+                </li>
+              </ul>
+            </div>
+
+            <button
+              onClick={() => handleSubscribe('pro')}
+              disabled={subscribingPlan !== null}
+              className="mt-8 w-full py-3.5 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 text-white dark:text-slate-900 font-bold text-xs rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 shadow-md"
+            >
+              {subscribingPlan === 'pro' ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <CreditCard className="w-4 h-4" />
+              )}
+              <span>{currentPlan === 'pro' ? 'Plano Atual (Renovar)' : 'Assinar Pro com Stripe (R$ 24,90)'}</span>
+            </button>
+          </div>
+
+          {/* Card 3: Plano Plus (Scans Ilimitados - R$ 49,90) */}
+          <div className="p-6 sm:p-7 bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 text-white rounded-3xl shadow-xl flex flex-col justify-between relative overflow-hidden border-2 border-emerald-400">
+            <span className="absolute top-4 right-4 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-extrabold rounded-full uppercase tracking-wider border border-white/30 shadow-sm">
+              Mais Escolhido • Sem Limites
+            </span>
+
+            <div className="space-y-4">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-200">
+                  Uso Irrestrito
+                </span>
+                <h3 className="text-xl sm:text-2xl font-black text-white">Plano Plus</h3>
+              </div>
+
+              <div className="text-3xl sm:text-4xl font-extrabold font-mono text-white">
+                R$ 49,90 <span className="text-xs font-normal text-emerald-100">/mês</span>
+              </div>
+
+              <div className="text-xs font-extrabold text-emerald-950 bg-emerald-100 px-3 py-1.5 rounded-xl shadow-sm flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                <span>Scans 100% ILIMITADOS</span>
+              </div>
+
+              <ul className="text-xs text-emerald-50 space-y-2.5 pt-2">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-200 shrink-0 mt-0.5" />
+                  <span><strong>Scans ILIMITADOS</strong> de câmera e código de barras</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-200 shrink-0 mt-0.5" />
+                  <span>IA Gemini 3.8 Flash prioritária (Tabela TACO oficial)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-200 shrink-0 mt-0.5" />
+                  <span>Substituições saudáveis personalizadas sem limites</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-200 shrink-0 mt-0.5" />
+                  <span>Relatórios executivos mensais em PDF com gráficos Recharts</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-200 shrink-0 mt-0.5" />
+                  <span>Suporte prioritário e novidades antecipadas</span>
+                </li>
+              </ul>
+            </div>
+
+            <button
+              onClick={() => handleSubscribe('plus')}
+              disabled={subscribingPlan !== null}
+              className="mt-8 w-full py-3.5 bg-white text-emerald-900 hover:bg-emerald-50 font-extrabold text-xs rounded-2xl transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 active:scale-98"
+            >
+              {subscribingPlan === 'plus' ? (
+                <Loader2 className="w-4 h-4 animate-spin text-emerald-800" />
+              ) : (
+                <Sparkles className="w-4 h-4 text-emerald-600" />
+              )}
+              <span>{currentPlan === 'plus' ? 'Plano Atual (Ativo)' : 'Assinar Plus com Stripe (R$ 49,90)'}</span>
             </button>
           </div>
 
         </div>
+
+        {/* Stripe Product Integration Drawer & Inspector */}
+        <div className="max-w-4xl mx-auto p-4 sm:p-5 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200/90 dark:border-slate-800/80 text-left space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center">
+                <Database className="w-4 h-4" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                  Integração do Produto no Stripe: NutriLense AI
+                </h4>
+                <p className="text-[11px] text-slate-500">
+                  Estrutura oficial de produto e preços sincronizáveis via Stripe API
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowStripeSpecs(!showStripeSpecs)}
+                className="px-3 py-1.5 text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <Code2 className="w-3.5 h-3.5 text-emerald-600" />
+                <span>{showStripeSpecs ? 'Ocultar Parâmetros' : 'Ver IDs do Stripe'}</span>
+              </button>
+
+              <button
+                onClick={handleSyncStripeProduct}
+                disabled={isSyncingStripe}
+                className="px-3.5 py-1.5 text-[11px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50 shadow-sm"
+              >
+                {isSyncingStripe ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                <span>Sincronizar no Stripe</span>
+              </button>
+            </div>
+          </div>
+
+          {stripeSyncResult && (
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 rounded-xl text-xs text-emerald-900 dark:text-emerald-100 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>{stripeSyncResult.message}</span>
+            </div>
+          )}
+
+          {showStripeSpecs && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs font-mono">
+              <div className="p-3 bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-1.5">
+                <div className="font-sans font-bold text-slate-800 dark:text-slate-200 text-[11px] flex items-center justify-between">
+                  <span>Produto Stripe</span>
+                  <span className="text-emerald-600">Ativo</span>
+                </div>
+                <div className="text-[11px] text-slate-500">Nome: <strong className="text-slate-900 dark:text-white">NutriLense AI</strong></div>
+                <div className="text-[11px] text-slate-500">Product ID: <strong className="text-slate-900 dark:text-white">prod_nutrilense_ai</strong></div>
+                <div className="text-[11px] text-slate-500">Moeda: <strong className="text-slate-900 dark:text-white">BRL (R$)</strong></div>
+              </div>
+
+              <div className="p-3 bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-1.5">
+                <div className="font-sans font-bold text-slate-800 dark:text-slate-200 text-[11px]">
+                  Preços & Cotas Recorrentes
+                </div>
+                <div className="text-[11px] text-slate-500">
+                  Pro: <strong className="text-slate-900 dark:text-white">price_nutrilense_pro_20scans</strong> (R$ 24,90/mês • 20 scans)
+                </div>
+                <div className="text-[11px] text-slate-500">
+                  Plus: <strong className="text-slate-900 dark:text-white">price_nutrilense_plus_unlimited</strong> (R$ 49,90/mês • Ilimitado)
+                </div>
+                <div className="text-[11px] text-slate-500">Intervalo: <strong className="text-slate-900 dark:text-white">Mensal</strong></div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Stripe Trust & Security Badges */}
+        <div className="pt-2 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-slate-500 dark:text-slate-400">
+          <span className="flex items-center gap-1.5">
+            <Lock className="w-3.5 h-3.5 text-emerald-600" />
+            Pagamentos Criptografados via Stripe
+          </span>
+          <span>·</span>
+          <span className="flex items-center gap-1.5">
+            <CreditCard className="w-3.5 h-3.5 text-emerald-600" />
+            Cartões de Crédito, Débito e Pix
+          </span>
+          <span>·</span>
+          <span>Cancele a qualquer momento em 1 clique</span>
+          <span>·</span>
+          <span>Ativação imediata de cota</span>
+        </div>
+
       </section>
 
       {/* FAQ Section */}

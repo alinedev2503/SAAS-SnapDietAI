@@ -90,13 +90,29 @@ export interface DailyLog {
   totalSodium: number;
 }
 
+export type PlanTier = 'free' | 'pro' | 'plus';
+
+export interface SubscriptionPlan {
+  id: PlanTier;
+  name: string;
+  tagline: string;
+  price: string;
+  monthlyLimitText: string;
+  maxScans: number;
+  features: string[];
+  isPopular?: boolean;
+}
+
 export interface WhiteLabelConfig {
   appName: string;
   primaryColor: string; // hex
   logoEmoji: string;
   activeAdapter: 'local' | 'supabase' | 'firebase';
   demoMaxScans: number;
+  currentPlan?: PlanTier;
   customDomain?: string;
   firebaseProjectId?: string;
   supabaseUrl?: string;
+  stripePublishableKey?: string;
 }
+
