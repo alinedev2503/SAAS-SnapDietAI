@@ -10,6 +10,7 @@ import { HistoryView } from './views/HistoryView';
 import { ProfileView } from './views/ProfileView';
 import { WhiteLabelAdminView } from './views/WhiteLabelAdminView';
 import { MonthlyReportPdf } from './components/MonthlyReportPdf';
+import { NutritionistFinderView } from './views/NutritionistFinderView';
 import { ProductScan } from './types/nutrition';
 
 function MainAppContent() {
@@ -50,6 +51,8 @@ function MainAppContent() {
         )}
 
         {activeTab === 'reports' && <MonthlyReportPdf />}
+
+        {activeTab === 'nutritionists' && <NutritionistFinderView />}
 
         {activeTab === 'profile' && <ProfileView />}
 

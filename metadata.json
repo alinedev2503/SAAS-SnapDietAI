@@ -1,6 +1,6 @@
 {
   "name": "NutriLense AI",
   "description": "Plataforma SaaS White-Label de inteligência nutricional por IA com leitura de rótulos e códigos de barras, alertas de restrições alimentares, substituições saudáveis e relatórios em PDF.",
-  "requestFramePermissions": [],
+  "requestFramePermissions": ["geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

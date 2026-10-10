@@ -31,6 +31,27 @@ export interface SuggestedSwap {
   reason: string;
 }
 
+export interface TacoBenchmarkNutrients {
+  calories: number;
+  protein: number;
+  carbohydrates: number;
+  totalFat: number;
+  dietaryFiber: number;
+  sodium: number; // in mg
+  calcium?: number; // in mg
+  iron?: number; // in mg
+}
+
+export interface TacoValidation {
+  matchedTacoItem: string; // Ex: "Arroz, integral, cozido"
+  tacoId: string; // Ex: "TACO-005"
+  category: string; // Ex: "Cereais e leguminosas"
+  benchmarkPer100g: TacoBenchmarkNutrients;
+  validationStatus: 'conforme' | 'divergente' | 'alerta';
+  auditNotes: string;
+  discrepancies?: string[];
+}
+
 export interface ProductScan {
   id: string;
   userId: string;
@@ -40,6 +61,7 @@ export interface ProductScan {
   imageUrl?: string;
   servingSize: string;
   tacoReference?: string;
+  tacoValidation?: TacoValidation;
   healthScore: number; // 0 to 100
   nutriScore: NutriScoreGrade;
   novaGroup: 1 | 2 | 3 | 4;
@@ -78,6 +100,23 @@ export interface UserProfile {
   targetFat: number;
   targetSodium: number;
   createdAt: string;
+}
+
+export type AchievementCategory = 'streak' | 'health' | 'science' | 'explorer' | 'community';
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string; // Emoji or Lucide identifier
+  badgeColor: string; // Tailwind color class
+  category: AchievementCategory;
+  criteria: string;
+  unlockedAt?: string;
+  progress: number; // 0 to 100
+  currentValue: number;
+  targetValue: number;
+  unit: string;
 }
 
 export interface DailyLog {

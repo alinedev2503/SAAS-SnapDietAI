@@ -25,6 +25,15 @@ import {
   Code2,
   ExternalLink,
   ChevronRight,
+  ChevronDown,
+  WifiOff,
+  BookOpen,
+  Download,
+  Mail,
+  Globe,
+  MapPin,
+  Navigation,
+  Cloud,
 } from 'lucide-react';
 import { useWhiteLabel } from '../context/WhiteLabelContext';
 
@@ -44,6 +53,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
   const [isSyncingStripe, setIsSyncingStripe] = useState<boolean>(false);
   const [stripeSyncResult, setStripeSyncResult] = useState<any>(null);
   const [weeklyUsageEstimate, setWeeklyUsageEstimate] = useState<number>(5);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   const handleSubscribe = async (plan: 'pro' | 'plus') => {
     setSubscribingPlan(plan);
@@ -337,7 +347,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Tudo para proteger sua saúde e de sua família</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           
           <div className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3 hover:border-emerald-500/50 transition-colors">
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center">
@@ -345,7 +355,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             </div>
             <h3 className="text-lg font-bold text-slate-900 dark:text-white">Scanner Visual & Barcode</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Leitura ultrarrápida tanto da foto do rótulo quanto pelo código de barras EAN-13, funcionando perfeitamente mesmo em iluminação de supermercado.
+              Leitura ultrarrápida tanto da foto do rótulo quanto pelo código de barras EAN-13, funcionando perfeitamente em qualquer dispositivo.
             </p>
           </div>
 
@@ -353,9 +363,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center">
               <ShieldCheck className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Filtro de Restrições Pessoais</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Filtro de Restrições</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Alertas vermelhos imediatos para celíacos, intolerantes a lactose, hipertensos (sódio elevado), diabéticos (açúcares ocultos), veganos e alérgicos a amendoim.
+              Alertas imediatos para celíacos, intolerantes a lactose, hipertensos (sódio elevado), diabéticos, veganos e alérgicos.
             </p>
           </div>
 
@@ -365,7 +375,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             </div>
             <h3 className="text-lg font-bold text-slate-900 dark:text-white">Relatórios PDF Mensais</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Acompanhe seu diário de consumo de 30 dias e baixe um relatório profissional em PDF para levar às suas consultas nutricionais ou médicas.
+              Acompanhe seu diário de consumo de 30 dias e baixe um relatório profissional em PDF para levar às suas consultas nutricionais.
+            </p>
+          </div>
+
+          <div className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3 hover:border-emerald-500/50 transition-colors">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center">
+              <Cloud className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Firestore & Google Auth</h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Persistência segura em nuvem com Cloud Firestore e login Google em 1 clique. Seus dados e medalhas sincronizados em tempo real.
             </p>
           </div>
 
@@ -748,38 +768,265 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
 
       </section>
 
-      {/* FAQ Section */}
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 space-y-6">
-        <div className="text-center space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Dúvidas Frequentes</span>
-          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">Perguntas Comuns</h2>
-        </div>
+      {/* Google Maps Nutritionist Integration Banner */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-950 text-white rounded-3xl p-6 sm:p-10 border border-emerald-900/50 shadow-xl relative overflow-hidden">
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            <div className="md:col-span-8 space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-xs font-semibold uppercase tracking-wider border border-emerald-500/30">
+                <MapPin className="w-3.5 h-3.5" />
+                Integração com Google Maps
+              </div>
+              <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                Encontre o Nutricionista Mais Próximo da Sua Localização
+              </h3>
+              <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl">
+                Aliamos a inteligência artificial do scanner à prescrição humana personalizada.
+                Descubra clínicas e consultórios credenciados com registro ativo no CRN, filtre por especialidade
+                (doenças crônicas, esportiva, funcional ou reeducação) e trace a rota no Google Maps com um clique.
+              </p>
+              <div className="pt-2 flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => onNavigateToTab('nutritionists')}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer"
+                >
+                  <Navigation className="w-4 h-4" />
+                  Explorar Nutricionistas no Mapa
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </button>
+                <span className="text-xs text-slate-400 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  GPS em tempo real + dados georreferenciados
+                </span>
+              </div>
+            </div>
 
-        <div className="space-y-3 text-xs">
-          
-          <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-1">
-            <h4 className="font-bold text-slate-900 dark:text-white text-sm">O scanner funciona em qualquer produto de supermercado?</h4>
-            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-              Sim! O NutriLense AI lê tanto imagens da tabela nutricional/lista de ingredientes quanto códigos de barras EAN-13 comuns em produtos brasileiros e internacionais.
-            </p>
+            <div className="md:col-span-4 bg-white/5 backdrop-blur-md p-5 rounded-2xl border border-white/10 space-y-3">
+              <div className="flex items-center gap-2 text-emerald-400 text-xs font-mono font-semibold">
+                <Sparkles className="w-4 h-4" />
+                CONECTIVIDADE CLÍNICA
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Compartilhe seu diário nutricional NutriLense e histórico da Tabela TACO diretamente com seu nutricionista antes da consulta.
+              </p>
+              <div className="pt-2 border-t border-white/10 text-[11px] text-slate-400 font-mono flex items-center justify-between">
+                <span>Google Maps Platform</span>
+                <span className="text-emerald-400">Raio até 50km</span>
+              </div>
+            </div>
           </div>
 
-          <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-1">
-            <h4 className="font-bold text-slate-900 dark:text-white text-sm">Como funciona o alerta de restrições alimentares?</h4>
-            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-              No seu perfil, você marca se possui intolerância a lactose, celíaca (glúten), hipertensão (sódio), diabetes ou alergias. Ao escanear, o aplicativo faz uma busca minuciosa na lista de ingredientes e emite avisos em destaque se houver incompatibilidade.
-            </p>
-          </div>
-
-          <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-1">
-            <h4 className="font-bold text-slate-900 dark:text-white text-sm">Posso baixar meus relatórios em PDF?</h4>
-            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-              Sim! Na aba "Relatórios PDF", você visualiza seu resumo mensal de consumo, aditivos evitados e média nutricional, podendo baixar um arquivo PDF formatado com 1 clique.
-            </p>
-          </div>
-
+          <div className="absolute -right-20 -top-20 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         </div>
       </section>
+
+      {/* FAQ Section */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 space-y-8">
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800 rounded-full text-emerald-700 dark:text-emerald-300 text-xs font-bold">
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span>Tire Suas Dúvidas</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Perguntas Frequentes</h2>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
+            Tudo o que você precisa saber sobre o funcionamento do scanner, auditoria científica TACO, modo offline e planos de acesso.
+          </p>
+        </div>
+
+        <div className="space-y-3.5">
+          {[
+            {
+              category: 'Restrições & Saúde',
+              icon: AlertTriangle,
+              q: 'Como o app analisa restrições?',
+              a: 'O NutriLense AI compara a lista completa de ingredientes e a composição centesimal do produto contra o seu perfil personalizado (lactose, glúten, sódio elevado para hipertensos, açúcares ocultos para diabéticos ou alergias alimentares). Utilizando a visão computacional do modelo Gemini, o sistema identifica derivados sutis, aditivos camuflados e contaminações cruzadas indicadas no rótulo, disparando alertas imediatos destacados em vermelho caso haja qualquer incompatibilidade com sua dieta.',
+            },
+            {
+              category: 'Base Científica & Precisão',
+              icon: BookOpen,
+              q: 'A base de dados é confiável?',
+              a: 'Sim, 100% fundamentada na ciência. Além da inteligência artificial de leitura de rótulos, o aplicativo utiliza a Tabela Brasileira de Composição de Alimentos — TACO (NEPA/UNICAMP 4ª Edição) como referência analítica secundária. Isso permite auditar a densidade calórica, distribuição de macronutrientes (proteínas, carboidratos e gorduras) e níveis de sódio real contra matrizes biológicas oficiais brasileiras, detectando divergências ou informações enganosas da indústria.',
+            },
+            {
+              category: 'Conectividade & PWA',
+              icon: WifiOff,
+              q: 'Posso usar o scanner offline?',
+              a: 'O histórico e a consulta de produtos escaneados funcionam perfeitamente sem internet graças à arquitetura Progressive Web App (PWA) com Service Worker avançado e cache local persistente. Caso você esteja em um supermercado com sinal fraco de 4G/5G, você pode consultar todos os alimentos previamente escaneados, revisar notas de saúde e macronutrientes. Para escanear um novo rótulo com visão multimodal Gemini e validação TACO em tempo real, uma conexão momentânea é utilizada para o processamento de imagem.',
+            },
+            {
+              category: 'Assinatura & Stripe',
+              icon: CreditCard,
+              q: 'Como cancelo minha assinatura?',
+              a: 'Você pode cancelar sua assinatura a qualquer momento com apenas 1 clique, sem burocracia ou taxas de rescisão. Toda a gestão de faturamento é processada diretamente pela infraestrutura segura do Stripe. Ao cancelar, você continua com acesso total aos benefícios do seu plano Pro ou Plus até o final do período mensal já contratado, retornando automaticamente ao plano gratuito sem nenhuma cobrança surpresa subsequente.',
+            },
+            {
+              category: 'Reconhecimento & Câmera',
+              icon: Camera,
+              q: 'O scanner funciona em qualquer produto de supermercado?',
+              a: 'Sim! O NutriLense AI lê tanto fotos da tabela nutricional e lista de ingredientes quanto códigos de barras EAN-13 comuns em produtos nacionais e internacionais. A IA classifica o grupo NOVA (nível de ultraprocessamento de 1 a 4), calcula a nota Nutri-Score (A a E) e rastreia aditivos nocivos em poucos segundos.',
+            },
+            {
+              category: 'Instalação Instantânea',
+              icon: Smartphone,
+              q: 'Preciso baixar pela Google Play ou Apple App Store para ter o app no celular?',
+              a: 'Não é necessário baixar das lojas de aplicativos! O NutriLense AI é um PWA homologado: você pode instalá-lo diretamente pelo navegador (no Safari do iPhone clicando em "Compartilhar" → "Adicionar à Tela de Início"; ou no Chrome/Android clicando no botão "Instalar App" no topo). Ele abre instantaneamente em tela cheia com comportamento de aplicativo nativo.',
+            },
+            {
+              category: 'Relatórios Executivos',
+              icon: FileBarChart,
+              q: 'Posso exportar relatórios nutricionais em PDF para levar ao médico ou nutricionista?',
+              a: 'Sim! Na aba "Relatórios PDF", você visualiza dashboards de evolução semanal de macronutrientes e calorias com gráficos Recharts e gera com um clique relatórios executivos para download ou impressão, ideais para acompanhamento esportivo ou consultas de rotina.',
+            },
+          ].map((item, idx) => {
+            const Icon = item.icon;
+            const isOpen = openFaqIndex === idx;
+
+            return (
+              <div
+                key={idx}
+                className={`bg-white dark:bg-slate-900 rounded-2xl border transition-all duration-200 overflow-hidden ${
+                  isOpen
+                    ? 'border-emerald-500/80 shadow-md ring-1 ring-emerald-500/20'
+                    : 'border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                }`}
+              >
+                <button
+                  onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                  className="w-full p-4 sm:p-5 text-left flex items-start sm:items-center justify-between gap-4 cursor-pointer focus:outline-none"
+                  aria-expanded={isOpen}
+                >
+                  <div className="flex items-start sm:items-center gap-3">
+                    <div className={`p-2 rounded-xl shrink-0 transition-colors ${
+                      isOpen
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block mb-0.5">
+                        {item.category}
+                      </span>
+                      <h4 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm leading-snug">
+                        {item.q}
+                      </h4>
+                    </div>
+                  </div>
+
+                  <div className={`p-1.5 rounded-lg text-slate-400 shrink-0 transition-transform duration-200 ${
+                    isOpen ? 'rotate-180 text-emerald-600 dark:text-emerald-400' : ''
+                  }`}>
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </button>
+
+                {isOpen && (
+                  <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0 border-t border-slate-100 dark:border-slate-800/80">
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed pt-3">
+                      {item.a}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Footer Section */}
+      <footer className="mt-16 pt-12 pb-8 border-t border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            
+            {/* App Info & Bio */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{config.logoEmoji}</span>
+                <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                  {config.appName}
+                </span>
+              </div>
+              <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400 max-w-sm">
+                Plataforma de inteligência nutricional multimodal combinando visão computacional Gemini, padrão científico TACO (UNICAMP) e navegação offline PWA.
+              </p>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-full text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold">
+                <Sparkles className="w-3 h-3 text-emerald-500" />
+                <span>Desenvolvido com Engenharia de Alta Performance</span>
+              </div>
+            </div>
+
+            {/* Quick Links & Developer Portfolio */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                Desenvolvedor & Portfólio
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Conheça outros projetos, soluções de software e arquiteturas completas desenvolvidas pela criadora do NutriLense AI:
+              </p>
+              <div>
+                <a
+                  href="https://alinedev.ai.studio"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-emerald-600 dark:hover:bg-emerald-500 rounded-xl text-xs font-bold transition-all shadow-sm group"
+                >
+                  <Globe className="w-4 h-4 text-emerald-400 dark:text-white" />
+                  <span>Acessar Portfólio Aline DEV</span>
+                  <ExternalLink className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
+                </a>
+              </div>
+              <span className="text-[11px] text-slate-400 block font-mono">
+                alinedev.ai.studio
+              </span>
+            </div>
+
+            {/* Forms of Contact & Support */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                Fale Conosco & Suporte
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Dúvidas comerciais, parcerias, suporte técnico ou feedback sobre o NutriLense AI:
+              </p>
+              <div className="space-y-2">
+                <a
+                  href="mailto:falecomnutrion@gmail.con"
+                  className="inline-flex items-center gap-2 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-200 transition-colors w-full"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 flex items-center justify-center shrink-0">
+                    <Mail className="w-4 h-4" />
+                  </div>
+                  <div className="truncate">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold block">E-mail de Contato</span>
+                    <span className="font-mono text-emerald-700 dark:text-emerald-400 font-semibold truncate block">
+                      falecomnutrion@gmail.con
+                    </span>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Bottom Copyright & Disclaimer */}
+          <div className="pt-8 border-t border-slate-200/60 dark:border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-xs text-slate-500">
+            <p>
+              © {new Date().getFullYear()} {config.appName}. Todos os direitos reservados.
+            </p>
+            <p className="text-[11px]">
+              Portfólio Oficial:{' '}
+              <a
+                href="https://alinedev.ai.studio"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline"
+              >
+                alinedev.ai.studio
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
 
     </div>
   );

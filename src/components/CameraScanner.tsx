@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Camera, X, Upload, Barcode, Sparkles, AlertCircle, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { Camera, X, Upload, Barcode, Sparkles, AlertCircle, RefreshCw, CheckCircle2, BookOpen } from 'lucide-react';
 import { useWhiteLabel } from '../context/WhiteLabelContext';
 import { ProductScan } from '../types/nutrition';
 
@@ -175,8 +175,14 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
           {isAnalyzing && (
             <div className="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white p-6 z-20">
               <Sparkles className="w-12 h-12 text-emerald-400 animate-spin mb-3" />
-              <p className="text-sm font-bold tracking-wide">Analisando Ingredientes por Gemini IA...</p>
-              <p className="text-xs text-slate-400 mt-1 text-center">Avaliando tabela nutricional, aditivos e restrições ({profile.dietaryRestrictions.join(', ') || 'Nenhuma'})</p>
+              <p className="text-sm font-bold tracking-wide">Auditando Rótulo por Gemini IA...</p>
+              <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-950/80 border border-emerald-500/60 rounded-full text-emerald-300 text-[11px] font-bold">
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Validação Secundária TACO (UNICAMP) Ativa</span>
+              </div>
+              <p className="text-xs text-slate-400 mt-2 text-center">
+                Validando tabela nutricional, alérgenos, aditivos químicos e comparando com matriz biológica de 100g.
+              </p>
             </div>
           )}
         </div>
@@ -186,6 +192,15 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
         {/* Control Footer */}
         <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 space-y-3">
           
+          {/* Scientific Badge */}
+          <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-slate-800">
+            <span className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-bold">
+              <BookOpen className="w-3.5 h-3.5" />
+              Auditoria Científica TACO (UNICAMP)
+            </span>
+            <span className="text-[10px] text-slate-400">Padrão 4ª Edição</span>
+          </div>
+
           {/* Main Shutter / Trigger */}
           <div className="flex items-center gap-2">
             <button
@@ -194,10 +209,10 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
               className="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Analisar Rótulo Agoraw</span>
+              <span>Analisar Rótulo Agora</span>
             </button>
 
-            <label className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 cursor-pointer flex items-center justify-center">
+            <label className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 cursor-pointer flex items-center justify-center" title="Enviar foto da galeria">
               <Upload className="w-5 h-5" />
               <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
             </label>

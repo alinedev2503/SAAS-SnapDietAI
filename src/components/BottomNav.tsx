@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, Home, Calendar, FileBarChart, User } from 'lucide-react';
+import { Camera, Home, Calendar, MapPin, User } from 'lucide-react';
 
 interface BottomNavProps {
   activeTab: string;
@@ -44,13 +44,13 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
         </div>
 
         <button
-          onClick={() => setActiveTab('reports')}
+          onClick={() => setActiveTab('nutritionists')}
           className={`flex flex-col items-center justify-center min-h-[44px] cursor-pointer transition-colors ${
-            activeTab === 'reports' ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-slate-500 dark:text-slate-400'
+            activeTab === 'nutritionists' ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-slate-500 dark:text-slate-400'
           }`}
         >
-          <FileBarChart className="w-5 h-5" />
-          <span className="text-[10px] tracking-tight mt-0.5">Relatórios</span>
+          <MapPin className="w-5 h-5" />
+          <span className="text-[10px] tracking-tight mt-0.5">Nutricionistas</span>
         </button>
 
         <button

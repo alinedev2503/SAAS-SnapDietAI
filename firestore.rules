@@ -1,30 +1,124 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Default deny
+
+    // Global Safety Net: Default-deny catch-all
     match /{document=**} {
       allow read, write: if false;
     }
 
+    // Hardened Primitives
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
     function isSignedIn() {
-      return request.auth != null;
+      return request.auth != null && request.auth.uid != null;
     }
 
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    // User Profile Rules
-    match /users/{userId} {
-      allow read, write: if isOwner(userId);
+    function incoming() {
+      return request.resource.data;
     }
 
-    // Scans Rules
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation helper for UserProfile
+    function isValidUserProfile(data, userId) {
+      return data.keys().hasAll(['id', 'name', 'email'])
+        && data.id is string && data.id == userId
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.email is string && data.email.size() > 0 && data.email.size() <= 150
+        && (!('targetCalories' in data) || (data.targetCalories is number && data.targetCalories >= 0 && data.targetCalories <= 20000))
+        && (!('dietaryRestrictions' in data) || (data.dietaryRestrictions is list && data.dietaryRestrictions.size() <= 20));
+    }
+
+    // Validation helper for ProductScan
+    function isValidScan(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'productName', 'healthScore', 'nutriScore'])
+        && data.id is string && isValidId(data.id)
+        && data.userId is string && data.userId == userId
+        && data.productName is string && data.productName.size() > 0 && data.productName.size() <= 200
+        && data.healthScore is number && data.healthScore >= 0 && data.healthScore <= 100
+        && data.nutriScore is string && data.nutriScore.size() <= 5
+        && (!('barcode' in data) || (data.barcode is string && data.barcode.size() <= 64))
+        && (!('ingredientsText' in data) || (data.ingredientsText is string && data.ingredientsText.size() <= 5000));
+    }
+
+    // Validation helper for DailyLog
+    function isValidDailyLog(data) {
+      return data.keys().hasAll(['date', 'totalCalories'])
+        && data.date is string && data.date.size() <= 20
+        && data.totalCalories is number && data.totalCalories >= 0;
+    }
+
+    // User Profile: /users/{userId}
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // PII isolation - users cannot list all other user profiles
+      allow create: if isOwner(userId)
+        && isValidId(userId)
+        && isValidUserProfile(incoming(), userId);
+      allow update: if isOwner(userId)
+        && isValidUserProfile(incoming(), userId)
+        && incoming().id == existing().id;
+      allow delete: if isOwner(userId);
+
+      // Scans Subcollection: /users/{userId}/scans/{scanId}
+      match /scans/{scanId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && isValidId(scanId)
+          && isValidScan(incoming(), userId);
+        allow update: if isOwner(userId)
+          && isValidScan(incoming(), userId)
+          && incoming().id == existing().id
+          && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId);
+      }
+
+      // Daily Logs Subcollection: /users/{userId}/dailyLogs/{logId}
+      match /dailyLogs/{logId} {
+        allow get, list: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && isValidDailyLog(incoming());
+        allow delete: if isOwner(userId);
+      }
+
+      // Achievements Subcollection: /users/{userId}/achievements/{achievementId}
+      match /achievements/{achievementId} {
+        allow get, list: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && incoming().id is string
+          && incoming().progress is number;
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    // Legacy / top-level scans fallback with strict owner isolation
     match /scans/{scanId} {
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn()
+        && isValidId(scanId)
+        && incoming().userId == request.auth.uid
+        && isValidScan(incoming(), request.auth.uid);
+      allow update: if isSignedIn()
+        && existing().userId == request.auth.uid
+        && incoming().userId == request.auth.uid
+        && isValidScan(incoming(), request.auth.uid);
       allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Connection testing doc
+    match /test/connection {
+      allow get: if true;
     }
 
   }

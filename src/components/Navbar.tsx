@@ -2,6 +2,7 @@ import React from 'react';
 import { useWhiteLabel } from '../context/WhiteLabelContext';
 import { Camera, Sparkles } from 'lucide-react';
 import { PWAInstallButton } from './PWAInstallButton';
+import { GoogleAuthButton } from './GoogleAuthButton';
 
 interface NavbarProps {
   activeTab: string;
@@ -54,6 +55,15 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenS
             Relatórios PDF
           </button>
           <button
+            onClick={() => setActiveTab('nutritionists')}
+            className={`hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'nutritionists' ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : ''
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            Nutricionistas
+          </button>
+          <button
             onClick={() => setActiveTab('profile')}
             className={`hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer ${
               activeTab === 'profile' ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : ''
@@ -63,9 +73,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenS
           </button>
         </nav>
 
-        {/* Zone 3: Primary Action & PWA Download Button */}
-        <div className="flex items-center gap-2.5">
+        {/* Zone 3: Primary Action & Google Auth & PWA */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
           <PWAInstallButton />
+
+          {/* Google Auth Custom Button (Login & Cloud Status) */}
+          <GoogleAuthButton onNavigateToProfile={() => setActiveTab('profile')} />
 
           <span className="hidden lg:inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-mono text-slate-600 dark:text-slate-400">
             <Sparkles className="w-3 h-3 text-emerald-500" />

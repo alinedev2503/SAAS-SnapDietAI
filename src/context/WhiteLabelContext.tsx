@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserProfile, ProductScan, WhiteLabelConfig, DailyLog, PlanTier } from '../types/nutrition';
 import { AdapterFactory } from '../services/storage/AdapterFactory';
+import { auth, loginWithGoogle, logoutUser, onAuthStateChanged } from '../services/firebase';
+import { User } from 'firebase/auth';
 import confetti from 'canvas-confetti';
 
 interface WhiteLabelContextType {
@@ -12,6 +14,10 @@ interface WhiteLabelContextType {
   currentPlan: PlanTier;
   showDemoModal: boolean;
   isLoading: boolean;
+  currentUser: User | null;
+  isAuthLoading: boolean;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
   updateConfig: (newConfig: Partial<WhiteLabelConfig>) => Promise<void>;
   updateProfile: (newProfile: Partial<UserProfile>) => Promise<void>;
   addScan: (scan: Omit<ProductScan, 'id' | 'scannedAt'>) => Promise<ProductScan | null>;
@@ -26,11 +32,14 @@ interface WhiteLabelContextType {
 const WhiteLabelContext = createContext<WhiteLabelContextType | undefined>(undefined);
 
 export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
+
   const [config, setConfig] = useState<WhiteLabelConfig>({
     appName: 'NutriLense AI',
     primaryColor: '#059669',
     logoEmoji: '🥗',
-    activeAdapter: 'local',
+    activeAdapter: 'firebase',
     demoMaxScans: 2,
     currentPlan: 'free',
   });
@@ -60,8 +69,6 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [showDemoModal, setShowDemoModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const adapter = AdapterFactory.getAdapter(config.activeAdapter);
-
   const refreshData = async () => {
     try {
       setIsLoading(true);
@@ -87,13 +94,67 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setCurrentUser(firebaseUser);
+      setIsAuthLoading(false);
+      if (firebaseUser) {
+        setConfig((prev) => ({ ...prev, activeAdapter: 'firebase' }));
+        const activeAdapter = AdapterFactory.getAdapter('firebase');
+        try {
+          const prof = await activeAdapter.getProfile();
+          setProfile(prof);
+          const hist = await activeAdapter.getScanHistory();
+          setHistory(hist);
+          const logs = await activeAdapter.getDailyLogs();
+          setDailyLogs(logs);
+        } catch (e) {
+          console.warn('[Firebase] Erro ao sincronizar dados iniciais do usuário:', e);
+        }
+      } else {
+        refreshData();
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
     refreshData();
   }, [config.activeAdapter]);
+
+  const signInWithGoogle = async () => {
+    try {
+      setIsLoading(true);
+      const user = await loginWithGoogle();
+      setCurrentUser(user);
+      setConfig((prev) => ({ ...prev, activeAdapter: 'firebase' }));
+      await refreshData();
+      try {
+        confetti({ particleCount: 70, spread: 50, origin: { y: 0.6 } });
+      } catch (_) {}
+    } catch (e) {
+      console.error('Erro ao autenticar com Google:', e);
+      throw e;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      await logoutUser();
+      setCurrentUser(null);
+      await refreshData();
+    } catch (e) {
+      console.error('Erro ao desconectar usuário:', e);
+    }
+  };
 
   const setPlan = async (plan: PlanTier) => {
     const scanLimit = plan === 'plus' ? 999999 : plan === 'pro' ? 20 : 2;
     localStorage.setItem('nutrilense_current_plan', plan);
     setCurrentPlanState(plan);
+    const adapter = AdapterFactory.getAdapter(config.activeAdapter);
     const updated = await adapter.saveWhiteLabelConfig({ currentPlan: plan, demoMaxScans: scanLimit });
     setConfig(updated);
     try {
@@ -108,19 +169,17 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           planId: plan,
-          customerEmail: profile.email,
+          customerEmail: profile.email || currentUser?.email || 'contato@nutrilense.ai',
         }),
       });
 
       const data = await response.json();
 
       if (data.url) {
-        // Real Stripe Checkout redirect if live URL returned
         window.location.href = data.url;
         return { success: true, url: data.url };
       }
 
-      // Test / Sandbox mode instant activation
       await setPlan(plan);
       return {
         success: true,
@@ -137,11 +196,13 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const updateConfig = async (newConfig: Partial<WhiteLabelConfig>) => {
+    const adapter = AdapterFactory.getAdapter(config.activeAdapter);
     const updated = await adapter.saveWhiteLabelConfig(newConfig);
     setConfig(updated);
   };
 
   const updateProfile = async (newProfile: Partial<UserProfile>) => {
+    const adapter = AdapterFactory.getAdapter(config.activeAdapter);
     const updated = await adapter.saveProfile(newProfile);
     setProfile(updated);
   };
@@ -154,6 +215,7 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return null;
     }
 
+    const adapter = AdapterFactory.getAdapter(config.activeAdapter);
     const saved = await adapter.saveScan(scanData);
     const newCount = demoScanCount + 1;
     setDemoScanCount(newCount);
@@ -164,6 +226,7 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const removeScan = async (id: string) => {
+    const adapter = AdapterFactory.getAdapter(config.activeAdapter);
     await adapter.deleteScan(id);
     await refreshData();
   };
@@ -187,6 +250,10 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         currentPlan,
         showDemoModal,
         isLoading,
+        currentUser,
+        isAuthLoading,
+        signInWithGoogle,
+        signOut,
         updateConfig,
         updateProfile,
         addScan,

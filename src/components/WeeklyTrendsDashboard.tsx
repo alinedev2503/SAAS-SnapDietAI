@@ -80,6 +80,17 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
 
   const chartData = generate7DaysData();
 
+  // Calculate weekly aggregates from actual scanned products
+  const weeklyTotals = chartData.reduce(
+    (acc, d) => ({
+      carbs: acc.carbs + d.carbs,
+      protein: acc.protein + d.protein,
+      fat: acc.fat + d.fat,
+      calories: acc.calories + d.calories,
+    }),
+    { carbs: 0, protein: 0, fat: 0, calories: 0 }
+  );
+
   return (
     <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
       
@@ -91,8 +102,11 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
             Evolução e Tendências Semanais (Recharts)
           </span>
           <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-            Dashboard de Consumo Nutricional
+            Ingestão Semanal de Macronutrientes & Calorias
           </h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Mapeamento dinâmico baseado nos produtos escaneados e alimentos auditados via TACO.
+          </p>
         </div>
 
         {/* Tab Controls */}
@@ -129,6 +143,38 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
           >
             Calorias vs. Meta
           </button>
+        </div>
+      </div>
+
+      {/* Macronutrients Weekly Summary Bar */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 bg-slate-50 dark:bg-slate-950/60 rounded-2xl border border-slate-200/60 dark:border-slate-800/80">
+        <div className="text-center p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+          <span className="text-[10px] uppercase font-bold text-slate-400 block">Carboidratos</span>
+          <span className="text-base font-extrabold text-sky-600 dark:text-sky-400 font-mono">
+            {weeklyTotals.carbs}g
+          </span>
+          <span className="text-[10px] text-slate-500 block">semana</span>
+        </div>
+        <div className="text-center p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+          <span className="text-[10px] uppercase font-bold text-slate-400 block">Proteínas</span>
+          <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+            {weeklyTotals.protein}g
+          </span>
+          <span className="text-[10px] text-slate-500 block">semana</span>
+        </div>
+        <div className="text-center p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+          <span className="text-[10px] uppercase font-bold text-slate-400 block">Gorduras Totais</span>
+          <span className="text-base font-extrabold text-amber-600 dark:text-amber-400 font-mono">
+            {weeklyTotals.fat}g
+          </span>
+          <span className="text-[10px] text-slate-500 block">semana</span>
+        </div>
+        <div className="text-center p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+          <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Calórico</span>
+          <span className="text-base font-extrabold text-slate-900 dark:text-white font-mono">
+            {weeklyTotals.calories}
+          </span>
+          <span className="text-[10px] text-slate-500 block">kcal semana</span>
         </div>
       </div>
 
