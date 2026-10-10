@@ -397,6 +397,55 @@ export const ProfileView: React.FC = () => {
           </div>
         </div>
       </div>
+      {/* Plano e Conta */}
+      <div className="p-6 bg-rose-50 dark:bg-rose-950/20 rounded-3xl border border-rose-200 dark:border-rose-900 shadow-sm space-y-4 mt-8">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+          Configurações de Conta e Plano
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <button
+            type="button"
+            onClick={() => setPlan(currentPlan === 'free' ? 'pro' : 'plus')}
+            className="w-full p-4 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-800 text-left hover:border-rose-400 transition-all"
+          >
+            <span className="font-bold text-slate-900 dark:text-white">Trocar Plano</span>
+            <p className="text-xs text-slate-500">Upgrade para Pro ou Plus</p>
+          </button>
+          
+          <button
+            type="button"
+            onClick={() => handleSave(new Event('submit') as any)}
+            className="w-full p-4 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-800 text-left hover:border-rose-400 transition-all"
+          >
+            <span className="font-bold text-slate-900 dark:text-white">Editar Dados</span>
+            <p className="text-xs text-slate-500">Salvar alterações no perfil</p>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setPlan('free')}
+            className="w-full p-4 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-800 text-left hover:border-rose-400 transition-all"
+          >
+            <span className="font-bold text-rose-600 dark:text-rose-400">Cancelar Plano</span>
+            <p className="text-xs text-slate-500">Retornar ao plano gratuito</p>
+          </button>
+          
+          <button
+            type="button"
+            onClick={async () => {
+              if (confirm('Tem certeza? Isso apagará todos os seus dados e removerá sua conta do app.')) {
+                await deleteAccount();
+                alert('Conta excluída com sucesso.');
+              }
+            }}
+            className="w-full p-4 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-800 text-left hover:border-rose-400 transition-all"
+          >
+            <span className="font-bold text-rose-600 dark:text-rose-400">Excluir Cadastro</span>
+            <p className="text-xs text-slate-500">Apagar todos os dados e conta</p>
+          </button>
+        </div>
+      </div>
 
     </form>
   );

@@ -8,6 +8,7 @@ import {
   User,
   setPersistence,
   browserLocalPersistence,
+  deleteUser,
 } from 'firebase/auth';
 import {
   getFirestore,
@@ -16,6 +17,7 @@ import {
   setDoc,
   getDocFromServer,
   Firestore,
+  deleteDoc,
 } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
@@ -195,5 +197,26 @@ export function getCurrentUser(): User | null {
   return auth.currentUser;
 }
 
-export { firebaseConfig, onAuthStateChanged };
+/**
+ * Exclui a conta do usuário e seus dados associados
+ */
+async function deleteAccount(): Promise<void> {
+  const user = auth.currentUser;
+  if (!user) return;
+  
+  try {
+    // Delete user document in Firestore
+    await deleteDoc(doc(db, 'users', user.uid));
+    
+    // Delete user from Auth
+    await deleteUser(user);
+    
+    console.log('[Firebase Auth] Conta do usuário excluída com sucesso.');
+  } catch (error) {
+    console.error('[Firebase Auth] Erro ao excluir conta:', error);
+    throw error;
+  }
+}
+
+export { firebaseConfig, onAuthStateChanged, deleteAccount };
 export default app;

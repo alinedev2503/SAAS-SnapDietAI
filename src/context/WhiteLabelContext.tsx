@@ -27,6 +27,7 @@ interface WhiteLabelContextType {
   refreshData: () => Promise<void>;
   setPlan: (plan: PlanTier) => Promise<void>;
   subscribeStripePlan: (plan: 'pro' | 'plus') => Promise<{ success: boolean; url?: string; message?: string }>;
+  deleteAccount: () => Promise<void>;
 }
 
 const WhiteLabelContext = createContext<WhiteLabelContextType | undefined>(undefined);
@@ -132,9 +133,11 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       try {
         confetti({ particleCount: 70, spread: 50, origin: { y: 0.6 } });
       } catch (_) {}
-    } catch (e) {
-      console.error('Erro ao autenticar com Google:', e);
-      throw e;
+    } catch (e: any) {
+      if (e?.code !== 'auth/popup-closed-by-user' && e?.code !== 'auth/cancelled-popup-request') {
+        console.error('Erro ao autenticar com Google:', e);
+        throw e;
+      }
     } finally {
       setIsLoading(false);
     }
@@ -239,6 +242,18 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setShowDemoModal(true);
   };
 
+  const deleteAccount = async () => {
+    try {
+      const { deleteAccount: firebaseDeleteAccount } = await import('../lib/firebase');
+      await firebaseDeleteAccount();
+      setCurrentUser(null);
+      await refreshData();
+    } catch (e) {
+      console.error('Erro ao excluir conta:', e);
+      throw e;
+    }
+  };
+
   return (
     <WhiteLabelContext.Provider
       value={{
@@ -263,6 +278,7 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         refreshData,
         setPlan,
         subscribeStripePlan,
+        deleteAccount,
       }}
     >
       {children}
