@@ -24,6 +24,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [barcodeInput, setBarcodeInput] = useState<string>('');
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [scanCategory, setScanCategory] = useState<ScanCategory>('industrializado');
 
   useEffect(() => {
     if (isOpen) {
@@ -84,18 +85,19 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
           imageBase64: finalImage,
           barcode: finalBarcode,
           userRestrictions: profile.dietaryRestrictions,
+          scanCategory,
         }),
       });
 
       const data = await response.json();
       if (data.success && data.product) {
-        const savedScan = await addScan(data.product);
+        const savedScan = await addScan({ ...data.product, scanCategory });
         if (savedScan) {
           onScanComplete(savedScan);
           onClose();
         }
       } else {
-        alert('Não foi possível ler o rótulo. Tente novamente com mais clareza.');
+        alert('Não foi possível ler o rótulo/prato. Tente novamente com mais clareza.');
       }
     } catch (err) {
       console.error('Scan error:', err);
@@ -131,8 +133,8 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
               <Camera className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Scanner de Rótulos & Código de Barras</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Posicione o rótulo ou insira o EAN</p>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">Scanner de Alimentos</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Rótulo ou Foto de Prato</p>
             </div>
           </div>
           <button
@@ -143,10 +145,27 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
           </button>
         </div>
 
+        {/* Mode Selector */}
+        <div className="flex p-2 gap-2 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+          {(['industrializado', 'prato_pronto'] as ScanCategory[]).map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setScanCategory(cat)}
+              className={`flex-1 py-2 text-xs font-bold rounded-lg capitalize transition-colors ${
+                scanCategory === cat
+                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300'
+                  : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              {cat === 'industrializado' ? 'Industrializado' : 'Prato Pronto'}
+            </button>
+          ))}
+        </div>
+
         {/* Camera Viewfinder / Preview */}
         <div className="relative bg-black flex-1 min-h-[280px] max-h-[360px] flex items-center justify-center overflow-hidden">
           {capturedImage ? (
-            <img src={capturedImage} alt="Captura de Rótulo" className="w-full h-full object-contain" />
+            <img src={capturedImage} alt="Captura" className="w-full h-full object-contain" />
           ) : stream ? (
             <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
           ) : (
@@ -175,14 +194,11 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
           {isAnalyzing && (
             <div className="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white p-6 z-20">
               <Sparkles className="w-12 h-12 text-emerald-400 animate-spin mb-3" />
-              <p className="text-sm font-bold tracking-wide">Auditando Rótulo por Gemini IA...</p>
+              <p className="text-sm font-bold tracking-wide">Auditando com Gemini IA...</p>
               <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-950/80 border border-emerald-500/60 rounded-full text-emerald-300 text-[11px] font-bold">
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>Validação Secundária TACO (UNICAMP) Ativa</span>
+                <span>Validação TACO (UNICAMP) Ativa</span>
               </div>
-              <p className="text-xs text-slate-400 mt-2 text-center">
-                Validando tabela nutricional, alérgenos, aditivos químicos e comparando com matriz biológica de 100g.
-              </p>
             </div>
           )}
         </div>
@@ -192,16 +208,6 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
         {/* Control Footer */}
         <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 space-y-3">
           
-          {/* Scientific Badge */}
-          <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-slate-800">
-            <span className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-bold">
-              <BookOpen className="w-3.5 h-3.5" />
-              Auditoria Científica TACO (UNICAMP)
-            </span>
-            <span className="text-[10px] text-slate-400">Padrão 4ª Edição</span>
-          </div>
-
-          {/* Main Shutter / Trigger */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleAnalyze()}
@@ -209,7 +215,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
               className="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Analisar Rótulo Agora</span>
+              <span>Analisar {scanCategory === 'industrializado' ? 'Rótulo' : 'Prato'} Agora</span>
             </button>
 
             <label className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 cursor-pointer flex items-center justify-center" title="Enviar foto da galeria">

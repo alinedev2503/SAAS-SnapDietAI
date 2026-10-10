@@ -495,7 +495,7 @@ app.post('/api/maps/nearby-nutritionists', async (req, res) => {
 // API Endpoint: Analyze product from image base64 or barcode
 app.post('/api/gemini/analyze-product', async (req, res) => {
   try {
-    const { imageBase64, barcode, userRestrictions = [] } = req.body;
+    const { imageBase64, barcode, userRestrictions = [], scanCategory } = req.body;
 
     // Check if barcode matches mock catalog first for instant response
     if (barcode && SAMPLE_PRODUCTS[barcode]) {
@@ -526,11 +526,12 @@ app.post('/api/gemini/analyze-product', async (req, res) => {
 
     // Injeta a base oficial de dados da Tabela TACO (NEPA/UNICAMP) no prompt
     const tacoContextPrompt = buildTacoContextPrompt();
-
+    
     const promptText = `Você é um nutricionista e bioquímico alimentar de elite no Brasil.
-Sua missão é analisar minuciosamente a foto deste produto/rótulo/prato de comida (ou o código de barras "${barcode || ''}") e aplicar um rigoroso PROTOCOLO DE AUDITORIA DUPLA.
-
-${tacoContextPrompt}
+    Sua missão é analisar minuciosamente a foto deste ${scanCategory === 'prato_pronto' ? 'prato de comida (seja preparado em casa ou em restaurante)' : 'produto industrializado (rótulo)'} (ou o código de barras "${barcode || ''}") e aplicar um rigoroso PROTOCOLO DE AUDITORIA DUPLA.
+    ${scanCategory === 'prato_pronto' ? 'Utilize seu conhecimento de gastronomia e nutrição para estimar os ingredientes, porções e valores nutricionais, fundamentando-se na Tabela TACO.' : 'Leia o rótulo atentamente e valide os dados declarados.'}
+    
+    ${tacoContextPrompt}
 
 PROTOCOLO DE AUDITORIA DUPLA OBRIGATÓRIO:
 1. EXTRAÇÃO PRIMÁRIA: Leia atentamente os dados visíveis no rótulo da embalagem (marca, porção, calorias, macronutrientes declarados, lista legível de ingredientes, alérgenos e aditivos).

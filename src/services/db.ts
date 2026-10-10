@@ -242,6 +242,7 @@ export class DatabaseService {
       triggeredAlerts: scanData.triggeredAlerts || [],
       suggestedSwaps: scanData.suggestedSwaps || [],
       scannedAt: now,
+      scanCategory: scanData.scanCategory || 'industrializado',
     };
 
     // Always update local cache immediately (Optimistic UI)

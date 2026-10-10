@@ -13,7 +13,7 @@ service cloud.firestore {
     }
 
     function isSignedIn() {
-      return request.auth != null && request.auth.uid != null;
+      return request.auth != null && request.auth.uid != null && request.auth.token.email_verified == true;
     }
 
     function isOwner(userId) {

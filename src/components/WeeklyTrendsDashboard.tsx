@@ -260,6 +260,29 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
         </div>
       </div>
 
+      {/* Meal Reminders */}
+      {(() => {
+        const lastScan = history.sort((a, b) => new Date(b.scannedAt).getTime() - new Date(a.scannedAt).getTime())[0];
+        const hoursSinceLastMeal = lastScan ? (new Date().getTime() - new Date(lastScan.scannedAt).getTime()) / (1000 * 60 * 60) : 24;
+        
+        if (hoursSinceLastMeal > 5) {
+          return (
+            <div className="p-4 bg-amber-50 dark:bg-amber-950/30 rounded-2xl border border-amber-200 dark:border-amber-800 flex items-center gap-4 animate-pulse">
+              <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                <Flame className="w-6 h-6" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-amber-900 dark:text-amber-100">Hora da Refeição!</h4>
+                <p className="text-xs text-amber-700 dark:text-amber-300">
+                  Parece que faz tempo desde seu último registro. Mantenha seu plano alimentar em dia!
+                </p>
+              </div>
+            </div>
+          );
+        }
+        return null;
+      })()}
+
     </div>
   );
 };

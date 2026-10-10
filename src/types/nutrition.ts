@@ -52,6 +52,8 @@ export interface TacoValidation {
   discrepancies?: string[];
 }
 
+export type ScanCategory = 'industrializado' | 'prato_pronto';
+
 export interface ProductScan {
   id: string;
   userId: string;
@@ -74,6 +76,7 @@ export interface ProductScan {
   triggeredAlerts: string[];
   suggestedSwaps: SuggestedSwap[];
   scannedAt: string; // ISO string date
+  scanCategory: ScanCategory;
 }
 
 export type DietaryRestriction =
