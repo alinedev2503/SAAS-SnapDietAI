@@ -760,9 +760,10 @@ function generateFallbackAnalysis(barcode?: string, userRestrictions: string[] =
 // Vite development middleware attachment
 async function setupServer() {
   if (process.env.NODE_ENV !== 'production') {
+    const fs = await import('fs');
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { middlewareMode: true, hmr: false },
       appType: 'custom',
     });
     app.use(vite.middlewares);
@@ -770,9 +771,9 @@ async function setupServer() {
     app.use('*', async (req, res, next) => {
       const url = req.originalUrl;
       try {
-        let template = await vite.transformIndexHtml(
-          url,
-          `<!doctype html>
+        const rawHtml = fs.existsSync(path.resolve(__dirname, 'index.html'))
+          ? fs.readFileSync(path.resolve(__dirname, 'index.html'), 'utf-8')
+          : `<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
@@ -783,8 +784,8 @@ async function setupServer() {
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
-</html>`
-        );
+</html>`;
+        const template = await vite.transformIndexHtml(url, rawHtml);
         res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
       } catch (e) {
         vite.ssrFixStacktrace(e as Error);

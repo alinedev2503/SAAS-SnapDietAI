@@ -1,5 +1,6 @@
 import React from 'react';
 import { Camera, Home, Calendar, MapPin, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface BottomNavProps {
   activeTab: string;
@@ -8,6 +9,8 @@ interface BottomNavProps {
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, onOpenScanner }) => {
+  const { t } = useTranslation();
+
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800 pb-safe">
       <div className="grid grid-cols-5 items-center h-16 px-1">
@@ -19,7 +22,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
           }`}
         >
           <Home className="w-5 h-5" />
-          <span className="text-[10px] tracking-tight mt-0.5">Início</span>
+          <span className="text-[10px] tracking-tight mt-0.5">{t('navbar.home')}</span>
         </button>
 
         <button
@@ -29,7 +32,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
           }`}
         >
           <Calendar className="w-5 h-5" />
-          <span className="text-[10px] tracking-tight mt-0.5">Diário</span>
+          <span className="text-[10px] tracking-tight mt-0.5">{t('navbar.diary', 'Diário')}</span>
         </button>
 
         {/* Central Prominent Camera Button */}
@@ -37,7 +40,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
           <button
             onClick={onOpenScanner}
             className="w-14 h-14 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-600/30 active:scale-95 transition-transform cursor-pointer"
-            aria-label="Escanear Rótulo"
+            aria-label={t('navbar.scanAria', 'Escanear Rótulo')}
           >
             <Camera className="w-6 h-6" />
           </button>
@@ -50,7 +53,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
           }`}
         >
           <MapPin className="w-5 h-5" />
-          <span className="text-[10px] tracking-tight mt-0.5">Nutricionistas</span>
+          <span className="text-[10px] tracking-tight mt-0.5">{t('navbar.nutritionists')}</span>
         </button>
 
         <button
@@ -60,7 +63,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
           }`}
         >
           <User className="w-5 h-5" />
-          <span className="text-[10px] tracking-tight mt-0.5">Perfil</span>
+          <span className="text-[10px] tracking-tight mt-0.5">{t('navbar.profile')}</span>
         </button>
 
       </div>

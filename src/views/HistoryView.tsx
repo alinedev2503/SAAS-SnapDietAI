@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useWhiteLabel } from '../context/WhiteLabelContext';
 import { ProductCard } from '../components/ProductCard';
 import { Calendar, Trash2, Camera, Flame, HeartPulse, WifiOff, CheckCircle2, Cloud, RefreshCw } from 'lucide-react';
@@ -11,6 +12,7 @@ interface HistoryViewProps {
 }
 
 export const HistoryView: React.FC<HistoryViewProps> = ({ onOpenScanner, onOpenSwaps }) => {
+  const { t } = useTranslation();
   const { history, profile, removeScan } = useWhiteLabel();
   const [syncStatus, setSyncStatus] = useState<SyncStatus>(dbService.getSyncStatus());
   const [syncingNow, setSyncingNow] = useState(false);
@@ -33,6 +35,8 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onOpenScanner, onOpenS
 
   const isOffline = !syncStatus.isOnline;
 
+  const [scanToDelete, setScanToDelete] = useState<ProductScan | null>(null);
+
   // Daily totals
   const totalCalories = history.reduce((acc, s) => acc + (s.macronutrients?.calories || 0), 0);
   const totalProtein = history.reduce((acc, s) => acc + (s.macronutrients?.protein || 0), 0);
@@ -40,6 +44,16 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onOpenScanner, onOpenS
   const totalFat = history.reduce((acc, s) => acc + (s.macronutrients?.totalFat || 0), 0);
 
   const calPercentage = Math.min(100, Math.round((totalCalories / profile.targetCalories) * 100));
+
+  const getDisplayProductName = (scan: ProductScan) => {
+    if (scan.id === 'scan_sample_1' || scan.productName.toLowerCase().includes('iogurte natural proteico')) {
+      return t('productCard.sample1Name', scan.productName);
+    }
+    if (scan.id === 'scan_sample_2' || scan.productName.toLowerCase().includes('refrigerante cola zero')) {
+      return t('productCard.sample2Name', scan.productName);
+    }
+    return scan.productName;
+  };
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -51,39 +65,42 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onOpenScanner, onOpenS
               <WifiOff className="w-4 h-4" />
             </div>
             <div>
-              <p className="font-bold">Modo Offline Ativo — Sem conexão com a internet</p>
+              <p className="font-bold">{t('history.offlineActive')}</p>
               <p className="text-[11px] text-amber-700 dark:text-amber-300">
-                Seu histórico de {history.length} produtos escaneados está salvo no cache local. {syncStatus.pendingCount > 0 ? `${syncStatus.pendingCount} novos scans serão sincronizados com o Firestore assim que a conexão retornar.` : 'Dados nutricionais disponíveis para consulta imediata.'}
+                {t('history.offlineDesc', { count: history.length })}{' '}
+                {syncStatus.pendingCount > 0
+                  ? t('history.offlinePending', { count: syncStatus.pendingCount })
+                  : t('history.offlineAvailable')}
               </p>
             </div>
           </div>
           <span className="px-2.5 py-1 bg-amber-200/80 dark:bg-amber-900 text-[10px] font-bold rounded-lg uppercase tracking-wider shrink-0">
-            Offline PWA
+            {t('history.offlineBadge')}
           </span>
         </div>
       ) : (
         <div className="flex items-center justify-between flex-wrap gap-2">
           {syncStatus.pendingCount > 0 ? (
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 rounded-xl border border-amber-200 dark:border-amber-800 text-xs">
-              <span>{syncStatus.pendingCount} scan(s) aguardando envio para o Firestore</span>
+              <span>{t('history.pendingSync', { count: syncStatus.pendingCount })}</span>
               <button
                 onClick={handleManualSync}
                 disabled={syncingNow || syncStatus.isSyncing}
                 className="px-2 py-0.5 bg-amber-600 hover:bg-amber-700 text-white rounded font-bold text-[10px] flex items-center gap-1 cursor-pointer transition-colors"
               >
                 <RefreshCw className={`w-3 h-3 ${syncingNow || syncStatus.isSyncing ? 'animate-spin' : ''}`} />
-                Sincronizar
+                {t('history.syncBtn')}
               </button>
             </div>
           ) : (
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-[11px] text-emerald-700 dark:text-emerald-300 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
               <Cloud className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span>Sincronizado com Cloud Firestore & Cache Offline</span>
+              <span>{t('history.cloudSynced')}</span>
             </div>
           )}
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-[11px] text-slate-500 dark:text-slate-400 rounded-full border border-slate-200/60 dark:border-slate-700/60">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Histórico persistente online/offline</span>
+            <span>{t('history.persistent')}</span>
           </div>
         </div>
       )}
@@ -94,16 +111,19 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onOpenScanner, onOpenS
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
               <HeartPulse className="w-4 h-4" />
-              Diário Alimentar do Dia
+              {t('history.dailyDiary')}
             </span>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Resumo de Consumo Escaneado</h2>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+              {t('history.summaryTitle')}
+            </h2>
           </div>
+
           <button
             onClick={onOpenScanner}
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
           >
             <Camera className="w-4 h-4" />
-            <span>Escanear Produto</span>
+            <span>{t('history.scanProduct')}</span>
           </button>
         </div>
 
@@ -113,7 +133,11 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onOpenScanner, onOpenS
             <span className="text-slate-700 dark:text-slate-300">
               {totalCalories} / {profile.targetCalories} kcal ({calPercentage}%)
             </span>
-            <span className="text-slate-500">{profile.targetCalories - totalCalories} kcal restantes</span>
+            <span className="text-slate-500">
+              {totalCalories > profile.targetCalories
+                ? t('history.kcalExceeded', { count: totalCalories - profile.targetCalories })
+                : t('history.kcalRemaining', { count: profile.targetCalories - totalCalories })}
+            </span>
           </div>
           <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
             <div
@@ -128,21 +152,21 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onOpenScanner, onOpenS
         {/* Macros Summary Grid */}
         <div className="grid grid-cols-3 gap-3 pt-2 text-center text-xs">
           <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
-            <span className="text-slate-500 block text-[10px]">Proteínas</span>
+            <span className="text-slate-500 block text-[10px]">{t('history.protein')}</span>
             <span className="font-bold text-emerald-600 font-mono text-sm">{totalProtein}g</span>
-            <span className="text-[10px] text-slate-400 block">meta {profile.targetProtein}g</span>
+            <span className="text-[10px] text-slate-400 block">{t('history.target', { target: profile.targetProtein })}</span>
           </div>
 
           <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
-            <span className="text-slate-500 block text-[10px]">Carboidratos</span>
+            <span className="text-slate-500 block text-[10px]">{t('history.carbs')}</span>
             <span className="font-bold text-slate-800 dark:text-slate-200 font-mono text-sm">{totalCarbs}g</span>
-            <span className="text-[10px] text-slate-400 block">meta {profile.targetCarbs}g</span>
+            <span className="text-[10px] text-slate-400 block">{t('history.target', { target: profile.targetCarbs })}</span>
           </div>
 
           <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
-            <span className="text-slate-500 block text-[10px]">Gorduras</span>
+            <span className="text-slate-500 block text-[10px]">{t('history.fat')}</span>
             <span className="font-bold text-slate-800 dark:text-slate-200 font-mono text-sm">{totalFat}g</span>
-            <span className="text-[10px] text-slate-400 block">meta {profile.targetFat}g</span>
+            <span className="text-[10px] text-slate-400 block">{t('history.target', { target: profile.targetFat })}</span>
           </div>
         </div>
       </div>
@@ -151,7 +175,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onOpenScanner, onOpenS
       <div className="space-y-4">
         <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
           <Calendar className="w-4 h-4 text-emerald-600" />
-          Histórico de Rótulos Escaneados ({history.length})
+          {t('history.feedTitle', { count: history.length })}
         </h3>
 
         {history.length > 0 ? (
@@ -160,9 +184,9 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onOpenScanner, onOpenS
               <div key={scan.id} className="relative group">
                 <ProductCard scan={scan} onOpenSwaps={onOpenSwaps} />
                 <button
-                  onClick={() => removeScan(scan.id)}
+                  onClick={() => setScanToDelete(scan)}
                   className="absolute top-4 right-4 p-2 bg-white/90 dark:bg-slate-800/90 text-rose-600 rounded-full shadow-sm hover:bg-rose-50 dark:hover:bg-rose-950 transition-colors cursor-pointer border border-slate-200/60 dark:border-slate-700 opacity-80 group-hover:opacity-100"
-                  title="Excluir do histórico"
+                  title={t('history.deleteTooltip')}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -172,19 +196,58 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onOpenScanner, onOpenS
         ) : (
           <div className="p-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-3">
             <Calendar className="w-10 h-10 text-slate-300 mx-auto" />
-            <h4 className="text-base font-bold text-slate-800 dark:text-slate-200">Nenhum produto escaneado ainda</h4>
+            <h4 className="text-base font-bold text-slate-800 dark:text-slate-200">
+              {t('history.emptyTitle')}
+            </h4>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              Utilize o scanner de câmera para ler seu primeiro rótulo ou código de barras e iniciar o diário.
+              {t('history.emptyDesc')}
             </p>
             <button
               onClick={onOpenScanner}
               className="px-4 py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition-colors cursor-pointer"
             >
-              Escanear Agora
+              {t('history.scanNow')}
             </button>
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {scanToDelete && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center">
+              <Trash2 className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                {t('history.deleteModalTitle')}
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                {t('history.deleteModalDesc', { product: getDisplayProductName(scanToDelete) })}
+              </p>
+            </div>
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                onClick={() => setScanToDelete(null)}
+                className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+              >
+                {t('history.cancel')}
+              </button>
+              <button
+                onClick={async () => {
+                  const id = scanToDelete.id;
+                  setScanToDelete(null);
+                  await removeScan(id);
+                }}
+                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-colors shadow-sm cursor-pointer"
+              >
+                {t('history.confirmDelete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

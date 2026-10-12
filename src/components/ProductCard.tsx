@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ProductScan, NutriScoreGrade } from '../types/nutrition';
 import {
   ShieldAlert,
@@ -32,6 +33,7 @@ const NUTRI_COLORS: Record<NutriScoreGrade, { bg: string; text: string; border: 
 };
 
 export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onDelete }) => {
+  const { t } = useTranslation();
   const [showTacoDetails, setShowTacoDetails] = useState<boolean>(false);
   const nutriColor = NUTRI_COLORS[scan.nutriScore] || NUTRI_COLORS.C;
 
@@ -44,6 +46,160 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
       scan.ingredientsText
     );
 
+  const riskMap: Record<string, string> = {
+    Baixo: t('productCard.riskLow'),
+    Médio: t('productCard.riskMedium'),
+    Alto: t('productCard.riskHigh'),
+    Crítico: t('productCard.riskCritical'),
+    Low: t('productCard.riskLow'),
+    Medium: t('productCard.riskMedium'),
+    High: t('productCard.riskHigh'),
+    Critical: t('productCard.riskCritical'),
+    Bajo: t('productCard.riskLow'),
+    Medio: t('productCard.riskMedium'),
+  };
+
+  const novaDescriptions: Record<number, string> = {
+    1: t('productCard.nova1'),
+    2: t('productCard.nova2'),
+    3: t('productCard.nova3'),
+    4: t('productCard.nova4'),
+  };
+
+  const getDisplayProductName = () => {
+    if (scan.id === 'scan_sample_1' || scan.productName.toLowerCase().includes('iogurte natural proteico')) {
+      return t('productCard.sample1Name', scan.productName);
+    }
+    if (scan.id === 'scan_sample_2' || scan.productName.toLowerCase().includes('refrigerante cola zero')) {
+      return t('productCard.sample2Name', scan.productName);
+    }
+    return scan.productName;
+  };
+
+  const translateAlert = (alertText: string) => {
+    if (/lactose/i.test(alertText)) return t('productCard.alertLactose', alertText);
+    if (/glúten|gluten/i.test(alertText)) return t('productCard.alertGluten', alertText);
+    if (/sódio|sodio|sodium/i.test(alertText)) return t('productCard.alertSodium', alertText);
+    if (/açúcar|acucar|sugar|diabetes|glicemia/i.test(alertText)) return t('productCard.alertSugar', alertText);
+    if (/amendoim|peanut|oleaginosas/i.test(alertText)) return t('productCard.alertPeanuts', alertText);
+    if (/soja|soy/i.test(alertText)) return t('productCard.alertSoy', alertText);
+    if (/aditivo/i.test(alertText)) return t('productCard.alertAdditives', alertText);
+    if (/ultraprocessado|nova\s*4/i.test(alertText)) return t('productCard.alertUltraProcessed', alertText);
+    if (/trans/i.test(alertText)) return t('productCard.alertTransFat', alertText);
+    if (/conservante/i.test(alertText)) return t('productCard.alertPreservatives', alertText);
+    return alertText;
+  };
+
+  const getDisplayTacoItem = (itemText: string) => {
+    if (/iogurte/i.test(itemText)) return t('productCard.tacoYogurt', itemText);
+    if (/refrigerante|cola/i.test(itemText)) return t('productCard.tacoCola', itemText);
+    if (/leite/i.test(itemText)) return t('productCard.tacoMilk', itemText);
+    if (/aveia/i.test(itemText)) return t('productCard.tacoOats', itemText);
+    if (/pão de queijo|pao de queijo/i.test(itemText)) return t('productCard.tacoCheeseBread', itemText);
+    if (/pão|pao.*integral/i.test(itemText)) return t('productCard.tacoBread', itemText);
+    if (/arroz/i.test(itemText)) return t('productCard.tacoRice', itemText);
+    if (/feijão|feijao/i.test(itemText)) return t('productCard.tacoBeans', itemText);
+    if (/frango/i.test(itemText)) return t('productCard.tacoChicken', itemText);
+    if (/ovo/i.test(itemText)) return t('productCard.tacoEgg', itemText);
+    return itemText;
+  };
+
+  const getDisplayCategory = (cat: string) => {
+    if (/leite/i.test(cat)) return t('productCard.catDairy', cat);
+    if (/bebida/i.test(cat)) return t('productCard.catBeverages', cat);
+    if (/leguminosa/i.test(cat)) return t('productCard.catCereals', cat);
+    if (/panificação|panificacao/i.test(cat)) return t('productCard.catBakery', cat);
+    if (/carne/i.test(cat)) return t('productCard.catMeat', cat);
+    if (/fruta/i.test(cat)) return t('productCard.catFruits', cat);
+    if (/verdura|hortaliça|hortalica/i.test(cat)) return t('productCard.catVegetables', cat);
+    return cat;
+  };
+
+  const getDisplayAuditNotes = () => {
+    if (tacoAudit.validationStatus === 'conforme') {
+      return t('productCard.auditNotesConforme', {
+        tacoItem: getDisplayTacoItem(tacoAudit.matchedTacoItem),
+        tacoId: tacoAudit.tacoId,
+      });
+    }
+    if (tacoAudit.validationStatus === 'divergente') {
+      return t('productCard.auditNotesDivergente', {
+        tacoItem: getDisplayTacoItem(tacoAudit.matchedTacoItem),
+        tacoId: tacoAudit.tacoId,
+      });
+    }
+    return t('productCard.auditNotesAlerta', {
+      tacoItem: getDisplayTacoItem(tacoAudit.matchedTacoItem),
+      tacoId: tacoAudit.tacoId,
+    });
+  };
+
+  const translateDiscrepancy = (disc: string) => {
+    if (/sódio elevado/i.test(disc)) {
+      const match = disc.match(/(\d+)mg\/100g vs (\d+)mg\/100g.*?\(\+?(\d+)%\)/);
+      if (match) {
+        return t('productCard.discSodium', { val: match[1], bench: match[2], diff: match[3] });
+      }
+    }
+    if (/teor proteico reduzido/i.test(disc)) {
+      const match = disc.match(/([\d.]+)g\/100g vs ([\d.]+)g\/100g/);
+      if (match) {
+        return t('productCard.discProtein', { val: match[1], bench: match[2], tacoId: tacoAudit.tacoId });
+      }
+    }
+    if (/fibras abaixo/i.test(disc)) {
+      const match = disc.match(/([\d.]+)g\/100g.*vs ([\d.]+)g\/100g/);
+      if (match) {
+        return t('productCard.discFiber', { val: match[1], bench: match[2] });
+      }
+    }
+    if (/densidade energética superior/i.test(disc)) {
+      const match = disc.match(/\(\+?(\d+)\s*kcal\/100g\)/);
+      return t('productCard.discCalories', { diff: match ? match[1] : '100' });
+    }
+    if (/inconsistência de açúcares/i.test(disc)) {
+      return t('productCard.discSugar');
+    }
+    return disc;
+  };
+
+  const translateBeneficial = (item: { name: string; reason: string }) => {
+    if (/prote[íi]na/i.test(item.name)) {
+      return {
+        name: t('productCard.subProteins', item.name),
+        reason: t('productCard.subProteinsReason', item.reason),
+      };
+    }
+    if (/c[áa]lcio/i.test(item.name)) {
+      return {
+        name: t('productCard.subCalcium', item.name),
+        reason: t('productCard.subCalciumReason', item.reason),
+      };
+    }
+    return item;
+  };
+
+  const translateHarmful = (item: { name: string; risk: string; description: string }) => {
+    if (/caramelo/i.test(item.name)) {
+      return {
+        name: t('productCard.subCaramel', item.name),
+        risk: riskMap[item.risk] || item.risk,
+        description: t('productCard.subCaramelDesc', item.description),
+      };
+    }
+    if (/fosf[óo]rico/i.test(item.name)) {
+      return {
+        name: t('productCard.subPhosphoric', item.name),
+        risk: riskMap[item.risk] || item.risk,
+        description: t('productCard.subPhosphoricDesc', item.description),
+      };
+    }
+    return {
+      ...item,
+      risk: riskMap[item.risk] || item.risk,
+    };
+  };
+
   return (
     <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col">
       
@@ -54,25 +210,25 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
-                {scan.brand || 'Marca Desconhecida'}
+                {scan.brand || t('productCard.unknownBrand')}
               </span>
               <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 rounded-full border border-emerald-200 dark:border-emerald-800">
                 <BookOpen className="w-3 h-3 text-emerald-600" />
-                TACO / UNICAMP
+                {t('productCard.tacoStandard')}
               </span>
             </div>
 
             <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
-              {scan.productName}
+              {getDisplayProductName()}
             </h3>
 
             <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-              Porção: {scan.servingSize} {scan.barcode ? `· EAN: ${scan.barcode}` : ''}
+              {t('productCard.serving')} {scan.servingSize} {scan.barcode ? `· EAN: ${scan.barcode}` : ''}
             </p>
 
             {scan.tacoReference && (
               <p className="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium pt-0.5">
-                ✓ {scan.tacoReference}
+                ✓ {getDisplayTacoItem(scan.tacoReference)}
               </p>
             )}
           </div>
@@ -91,7 +247,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
               <span className="text-xl leading-none">{scan.healthScore}</span>
               <span className="text-[9px] uppercase tracking-wider opacity-90">/100</span>
             </div>
-            <span className="text-[10px] font-medium text-slate-500 mt-1">Índice Nutri</span>
+            <span className="text-[10px] font-medium text-slate-500 mt-1">{t('productCard.nutriIndex')}</span>
           </div>
         </div>
 
@@ -106,7 +262,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
 
           {/* NOVA Classification */}
           <div className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-            NOVA {scan.novaGroup}: <span className="font-semibold">{scan.novaDescription}</span>
+            NOVA {scan.novaGroup}: <span className="font-semibold">{novaDescriptions[scan.novaGroup] || scan.novaDescription}</span>
           </div>
 
         </div>
@@ -116,11 +272,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
           <div className="mt-4 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-2xl space-y-1">
             <div className="flex items-center gap-1.5 text-xs font-bold text-rose-700 dark:text-rose-400">
               <ShieldAlert className="w-4 h-4 text-rose-600" />
-              <span>Alertas de Restrições e Saúde:</span>
+              <span>{t('productCard.alertsTitle')}</span>
             </div>
             <ul className="text-xs text-rose-800 dark:text-rose-300 space-y-0.5 pl-5 list-disc">
               {scan.triggeredAlerts.map((alert, idx) => (
-                <li key={idx} className="font-medium">{alert}</li>
+                <li key={idx} className="font-medium">{translateAlert(alert)}</li>
               ))}
             </ul>
           </div>
@@ -132,34 +288,34 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
       <div className="p-5 border-b border-slate-100 dark:border-slate-800">
         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
           <Flame className="w-4 h-4 text-amber-500" />
-          Tabela Nutricional por Porção (Padrão TACO)
+          {t('productCard.nutritionTitle')}
         </h4>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           
           <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-center">
-            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">Calorias</span>
+            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">{t('productCard.calories')}</span>
             <span className="text-base font-bold font-mono text-slate-900 dark:text-white">
               {scan.macronutrients.calories} <span className="text-xs font-normal text-slate-500">kcal</span>
             </span>
           </div>
 
           <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-center">
-            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">Proteínas</span>
+            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">{t('productCard.protein')}</span>
             <span className="text-base font-bold font-mono text-emerald-600 dark:text-emerald-400">
               {scan.macronutrients.protein}g
             </span>
           </div>
 
           <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-center">
-            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">Carboidratos</span>
+            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">{t('productCard.carbs')}</span>
             <span className="text-base font-bold font-mono text-slate-900 dark:text-white">
               {scan.macronutrients.carbohydrates}g
             </span>
           </div>
 
           <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-center">
-            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">Sódio</span>
+            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">{t('productCard.sodium')}</span>
             <span className="text-base font-bold font-mono text-slate-900 dark:text-white">
               {scan.macronutrients.sodium}mg
             </span>
@@ -177,10 +333,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
             </div>
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 block">
-                Auditoria Secundária TACO (UNICAMP)
+                {t('productCard.tacoAudit')}
               </span>
               <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                Ref: {tacoAudit.matchedTacoItem} ({tacoAudit.tacoId})
+                {t('productCard.tacoRef')} {getDisplayTacoItem(tacoAudit.matchedTacoItem)} ({tacoAudit.tacoId})
               </span>
             </div>
           </div>
@@ -196,17 +352,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
               {tacoAudit.validationStatus === 'conforme' ? (
                 <>
                   <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                  <span>Conforme TACO</span>
+                  <span>{t('productCard.tacoCompliant')}</span>
                 </>
               ) : tacoAudit.validationStatus === 'divergente' ? (
                 <>
                   <AlertTriangle className="w-3 h-3 text-amber-600" />
-                  <span>Divergência</span>
+                  <span>{t('productCard.tacoDiscrepancy')}</span>
                 </>
               ) : (
                 <>
                   <ShieldAlert className="w-3 h-3 text-rose-600" />
-                  <span>Alerta TACO</span>
+                  <span>{t('productCard.tacoAlert')}</span>
                 </>
               )}
             </span>
@@ -214,7 +370,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
             <button
               onClick={() => setShowTacoDetails(!showTacoDetails)}
               className="p-1 text-slate-500 hover:text-slate-800 dark:hover:text-white rounded-lg transition-colors cursor-pointer"
-              title="Expandir comparação detalhada"
+              title={t('productCard.expandComparison')}
             >
               {showTacoDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </button>
@@ -223,18 +379,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
 
         {/* Audit Notes Brief */}
         <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-          {tacoAudit.auditNotes}
+          {getDisplayAuditNotes()}
         </p>
 
         {/* Discrepancies Alert Box if any */}
         {tacoAudit.discrepancies && tacoAudit.discrepancies.length > 0 && (
           <div className="p-2.5 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/80 rounded-xl space-y-1">
             <span className="text-[10px] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider block">
-              Inconsistências Detectadas vs TACO:
+              {t('productCard.inconsistenciesTitle')}
             </span>
             <ul className="text-[11px] text-amber-900 dark:text-amber-200 pl-4 list-disc space-y-0.5">
               {tacoAudit.discrepancies.map((d, i) => (
-                <li key={i}>{d}</li>
+                <li key={i}>{translateDiscrepancy(d)}</li>
               ))}
             </ul>
           </div>
@@ -244,31 +400,31 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
         {showTacoDetails && (
           <div className="pt-2 border-t border-emerald-200/50 dark:border-emerald-800/50 space-y-2">
             <div className="flex items-center justify-between text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-              <span>Comparativo Centesimal (Base 100g)</span>
-              <span>Categoria: {tacoAudit.category}</span>
+              <span>{t('productCard.centesimalTitle')}</span>
+              <span>{t('productCard.category')} {getDisplayCategory(tacoAudit.category)}</span>
             </div>
 
             <div className="grid grid-cols-4 gap-2 text-center text-[10px]">
               <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
-                <span className="text-slate-400 block text-[9px]">Calorias</span>
+                <span className="text-slate-400 block text-[9px]">{t('productCard.calories')}</span>
                 <span className="font-bold text-slate-900 dark:text-white block">{scan.macronutrients.calories} kcal</span>
                 <span className="text-[9px] text-emerald-600">TACO: {tacoAudit.benchmarkPer100g.calories}</span>
               </div>
 
               <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
-                <span className="text-slate-400 block text-[9px]">Proteína</span>
+                <span className="text-slate-400 block text-[9px]">{t('productCard.protein')}</span>
                 <span className="font-bold text-slate-900 dark:text-white block">{scan.macronutrients.protein}g</span>
                 <span className="text-[9px] text-emerald-600">TACO: {tacoAudit.benchmarkPer100g.protein}g</span>
               </div>
 
               <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
-                <span className="text-slate-400 block text-[9px]">Carboidratos</span>
+                <span className="text-slate-400 block text-[9px]">{t('productCard.carbs')}</span>
                 <span className="font-bold text-slate-900 dark:text-white block">{scan.macronutrients.carbohydrates}g</span>
                 <span className="text-[9px] text-emerald-600">TACO: {tacoAudit.benchmarkPer100g.carbohydrates}g</span>
               </div>
 
               <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
-                <span className="text-slate-400 block text-[9px]">Sódio</span>
+                <span className="text-slate-400 block text-[9px]">{t('productCard.sodium')}</span>
                 <span className="font-bold text-slate-900 dark:text-white block">{scan.macronutrients.sodium}mg</span>
                 <span className="text-[9px] text-emerald-600">TACO: {tacoAudit.benchmarkPer100g.sodium}mg</span>
               </div>
@@ -284,19 +440,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
         <div className="space-y-2">
           <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Componentes Benéficos:</span>
+            <span>{t('productCard.beneficialTitle')}</span>
           </div>
           {scan.beneficialSubstances.length > 0 ? (
             <div className="space-y-1.5">
-              {scan.beneficialSubstances.map((item, idx) => (
-                <div key={idx} className="p-2 bg-emerald-50/60 dark:bg-emerald-950/30 rounded-xl border border-emerald-200/60 dark:border-emerald-900/40 text-xs">
-                  <span className="font-bold text-emerald-800 dark:text-emerald-300 block">{item.name}</span>
-                  <span className="text-emerald-700/80 dark:text-emerald-400/80 text-[11px]">{item.reason}</span>
-                </div>
-              ))}
+              {scan.beneficialSubstances.map((rawItem, idx) => {
+                const item = translateBeneficial(rawItem);
+                return (
+                  <div key={idx} className="p-2 bg-emerald-50/60 dark:bg-emerald-950/30 rounded-xl border border-emerald-200/60 dark:border-emerald-900/40 text-xs">
+                    <span className="font-bold text-emerald-800 dark:text-emerald-300 block">{item.name}</span>
+                    <span className="text-emerald-700/80 dark:text-emerald-400/80 text-[11px]">{item.reason}</span>
+                  </div>
+                );
+              })}
             </div>
           ) : (
-            <p className="text-xs text-slate-400 italic">Nenhum nutriente benéfico relevante destacado neste rótulo.</p>
+            <p className="text-xs text-slate-400 italic">{t('productCard.noBeneficial')}</p>
           )}
         </div>
 
@@ -304,24 +463,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
         <div className="space-y-2">
           <div className="flex items-center gap-1.5 text-xs font-bold text-rose-700 dark:text-rose-400">
             <AlertTriangle className="w-4 h-4 text-rose-600" />
-            <span>Aditivos e Substâncias Nocivas:</span>
+            <span>{t('productCard.harmfulTitle')}</span>
           </div>
           {scan.harmfulSubstances.length > 0 ? (
             <div className="space-y-1.5">
-              {scan.harmfulSubstances.map((item, idx) => (
-                <div key={idx} className="p-2 bg-rose-50/60 dark:bg-rose-950/30 rounded-xl border border-rose-200/60 dark:border-rose-900/40 text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-rose-800 dark:text-rose-300">{item.name}</span>
-                    <span className="text-[10px] px-1.5 py-0.5 bg-rose-200 dark:bg-rose-900 text-rose-800 dark:text-rose-200 rounded font-semibold">
-                      Risco {item.risk}
-                    </span>
+              {scan.harmfulSubstances.map((rawItem, idx) => {
+                const item = translateHarmful(rawItem);
+                return (
+                  <div key={idx} className="p-2 bg-rose-50/60 dark:bg-rose-950/30 rounded-xl border border-rose-200/60 dark:border-rose-900/40 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-rose-800 dark:text-rose-300">{item.name}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 bg-rose-200 dark:bg-rose-900 text-rose-800 dark:text-rose-200 rounded font-semibold">
+                        {t('productCard.risk', { risk: item.risk })}
+                      </span>
+                    </div>
+                    <span className="text-rose-700/80 dark:text-rose-400/80 text-[11px] block mt-0.5">{item.description}</span>
                   </div>
-                  <span className="text-rose-700/80 dark:text-rose-400/80 text-[11px] block mt-0.5">{item.description}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
-            <p className="text-xs text-emerald-600 font-medium">Livre de aditivos nocivos detectados!</p>
+            <p className="text-xs text-emerald-600 font-medium">{t('productCard.freeOfHarmful')}</p>
           )}
         </div>
 
@@ -335,11 +497,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
             className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
           >
             <Sparkles className="w-4 h-4" />
-            <span>Ver Substituições Saudáveis ({scan.suggestedSwaps.length})</span>
+            <span>{t('productCard.viewSwaps', { count: scan.suggestedSwaps.length })}</span>
             <ArrowRight className="w-4 h-4 ml-auto" />
           </button>
         ) : (
-          <span className="text-xs text-slate-500 font-medium">Análise registrada com padrão TACO/UNICAMP</span>
+          <span className="text-xs text-slate-500 font-medium">{t('productCard.recordedStandard')}</span>
         )}
       </div>
 

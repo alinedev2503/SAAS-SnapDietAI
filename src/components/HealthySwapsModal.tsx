@@ -13,6 +13,30 @@ export const HealthySwapsModal: React.FC<HealthySwapsModalProps> = ({ scan, onCl
 
   if (!scan) return null;
 
+  const getDisplayProductName = (pName: string) => {
+    if (pName.toLowerCase().includes('iogurte natural proteico')) {
+      return t('productCard.sample1Name', pName);
+    }
+    if (pName.toLowerCase().includes('refrigerante cola zero')) {
+      return t('productCard.sample2Name', pName);
+    }
+    return pName;
+  };
+
+  const getDisplaySwapName = (sName: string) => {
+    if (/kombucha/i.test(sName)) {
+      return t('productCard.swapKombucha', sName);
+    }
+    return sName;
+  };
+
+  const getDisplaySwapReason = (reason: string) => {
+    if (/probi[óo]tico/i.test(reason)) {
+      return t('productCard.swapKombuchaReason', reason);
+    }
+    return reason;
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white dark:bg-slate-900 w-full max-w-xl rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]">
@@ -42,7 +66,7 @@ export const HealthySwapsModal: React.FC<HealthySwapsModalProps> = ({ scan, onCl
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
               {t('modals.swaps.currentProduct')}
             </span>
-            <h4 className="text-sm font-bold text-slate-900 dark:text-white">{scan.productName}</h4>
+            <h4 className="text-sm font-bold text-slate-900 dark:text-white">{getDisplayProductName(scan.productName)}</h4>
             <p className="text-xs text-slate-500">{scan.brand}</p>
           </div>
           <div className="text-right">
@@ -73,7 +97,7 @@ export const HealthySwapsModal: React.FC<HealthySwapsModalProps> = ({ scan, onCl
                     <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
                       {t('modals.swaps.option', { num: idx + 1 })}
                     </span>
-                    <h4 className="text-base font-bold text-slate-900 dark:text-white leading-snug">{swap.productName}</h4>
+                    <h4 className="text-base font-bold text-slate-900 dark:text-white leading-snug">{getDisplaySwapName(swap.productName)}</h4>
                     <span className="text-xs text-slate-500">{swap.brand}</span>
                   </div>
 
@@ -89,7 +113,7 @@ export const HealthySwapsModal: React.FC<HealthySwapsModalProps> = ({ scan, onCl
 
                 <div className="p-2.5 bg-emerald-50/80 dark:bg-emerald-950/40 rounded-xl text-xs text-emerald-900 dark:text-emerald-200 border border-emerald-200/50 dark:border-emerald-900/50 flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>{swap.reason}</span>
+                  <span>{getDisplaySwapReason(swap.reason)}</span>
                 </div>
               </div>
             ))
