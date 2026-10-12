@@ -28,6 +28,7 @@ interface WhiteLabelContextType {
   setPlan: (plan: PlanTier) => Promise<void>;
   subscribeStripePlan: (plan: 'pro' | 'plus') => Promise<{ success: boolean; url?: string; message?: string }>;
   deleteAccount: () => Promise<void>;
+  isUS: boolean;
 }
 
 const WhiteLabelContext = createContext<WhiteLabelContextType | undefined>(undefined);
@@ -69,6 +70,7 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   });
   const [showDemoModal, setShowDemoModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isUS] = useState(() => Intl.DateTimeFormat().resolvedOptions().timeZone.startsWith('America/'));
 
   const refreshData = async () => {
     try {
@@ -80,7 +82,7 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const logs = await activeAdapter.getDailyLogs();
 
       const savedPlan = (localStorage.getItem('nutrilense_current_plan') as PlanTier) || conf.currentPlan || 'free';
-      const scanLimit = savedPlan === 'plus' ? 999999 : savedPlan === 'pro' ? 20 : 2;
+      const scanLimit = savedPlan === 'plus' ? 60 : savedPlan === 'pro' ? 20 : 2;
 
       setConfig({ ...conf, currentPlan: savedPlan, demoMaxScans: scanLimit });
       setCurrentPlanState(savedPlan);
@@ -154,7 +156,7 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const setPlan = async (plan: PlanTier) => {
-    const scanLimit = plan === 'plus' ? 999999 : plan === 'pro' ? 20 : 2;
+    const scanLimit = plan === 'plus' ? 60 : plan === 'pro' ? 20 : 2;
     localStorage.setItem('nutrilense_current_plan', plan);
     setCurrentPlanState(plan);
     const adapter = AdapterFactory.getAdapter(config.activeAdapter);
@@ -173,6 +175,7 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         body: JSON.stringify({
           planId: plan,
           customerEmail: profile.email || currentUser?.email || 'contato@nutrilense.ai',
+          isUS,
         }),
       });
 
@@ -186,14 +189,14 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       await setPlan(plan);
       return {
         success: true,
-        message: data.message || `Plano ${plan === 'plus' ? 'Plus (Ilimitado)' : 'Pro (20 Scans)'} ativado com sucesso!`,
+        message: data.message || `Plano ${plan === 'plus' ? 'Plus (60 Scans no mês)' : 'Pro (20 Scans no mês)'} ativado com sucesso!`,
       };
     } catch (err: any) {
       console.warn('Stripe checkout error, fallback to simulated activation:', err);
       await setPlan(plan);
       return {
         success: true,
-        message: `Plano ${plan === 'plus' ? 'Plus (Ilimitado)' : 'Pro (20 Scans)'} ativado em modo sandbox.`,
+        message: `Plano ${plan === 'plus' ? 'Plus (60 Scans no mês)' : 'Pro (20 Scans no mês)'} ativado em modo sandbox.`,
       };
     }
   };
@@ -211,7 +214,7 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const addScan = async (scanData: Omit<ProductScan, 'id' | 'scannedAt'>): Promise<ProductScan | null> => {
-    const limit = currentPlan === 'plus' ? 999999 : currentPlan === 'pro' ? 20 : 2;
+    const limit = currentPlan === 'plus' ? 60 : currentPlan === 'pro' ? 20 : 2;
 
     if (demoScanCount >= limit) {
       setShowDemoModal(true);
@@ -279,6 +282,7 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setPlan,
         subscribeStripePlan,
         deleteAccount,
+        isUS,
       }}
     >
       {children}

@@ -42,8 +42,10 @@ const STRIPE_PLANS = [
   {
     id: 'free',
     name: 'Plano Gratuito',
-    price: 'R$ 0,00',
-    amount: 0,
+    priceBrl: 'R$ 0,00',
+    amountBrl: 0,
+    priceUsd: '$ 0.00',
+    amountUsd: 0,
     monthlyLimitText: '2 scans gratuitos',
     maxScans: 2,
     features: [
@@ -56,8 +58,10 @@ const STRIPE_PLANS = [
   {
     id: 'pro',
     name: 'Plano Pro',
-    price: 'R$ 24,90',
-    amount: 2490, // centavos BRL
+    priceBrl: 'R$ 24,90',
+    amountBrl: 2490, // centavos BRL
+    priceUsd: '$ 9.99',
+    amountUsd: 999, // centavos USD
     monthlyLimitText: '20 scans no mês',
     maxScans: 20,
     features: [
@@ -71,15 +75,17 @@ const STRIPE_PLANS = [
   {
     id: 'plus',
     name: 'Plano Plus',
-    price: 'R$ 49,90',
-    amount: 4990, // centavos BRL
-    monthlyLimitText: 'Scans Ilimitados',
-    maxScans: 999999,
+    priceBrl: 'R$ 49,90',
+    amountBrl: 4990, // centavos BRL
+    priceUsd: '$ 19.99',
+    amountUsd: 1999, // centavos USD
+    monthlyLimitText: '60 scans no mês',
+    maxScans: 60,
     isPopular: true,
     features: [
-      'Scans ILIMITADOS de câmera e código de barras',
+      'Cota de 60 scans de rótulos no mês (câmera & código de barras)',
       'IA Gemini 3.8 Flash prioritária com Tabela TACO',
-      'Trocas saudáveis personalizadas sem limites',
+      'Trocas saudáveis personalizadas para cada produto',
       'Relatórios mensais executivos em PDF com gráficos Recharts',
       'Acesso antecipado a novos recursos e suporte prioritário',
     ],
@@ -214,8 +220,8 @@ app.post('/api/stripe/provision-product', async (_req, res) => {
             unit_amount: 4990,
             currency: 'brl',
             recurring: { interval: 'month' },
-            nickname: 'NutriLense AI Plus (Scans Ilimitados)',
-            metadata: { planId: 'plus', maxScans: 'unlimited' },
+            nickname: 'NutriLense AI Plus (60 Scans/mês)',
+            metadata: { planId: 'plus', maxScans: '60' },
           });
         }
 
@@ -225,7 +231,7 @@ app.post('/api/stripe/provision-product', async (_req, res) => {
           product: { id: product.id, name: product.name },
           prices: {
             pro: { id: proPrice.id, amount: proPrice.unit_amount, limit: '20 scans/mês' },
-            plus: { id: plusPrice.id, amount: plusPrice.unit_amount, limit: 'Ilimitado' },
+            plus: { id: plusPrice.id, amount: plusPrice.unit_amount, limit: '60 scans/mês' },
           },
           message: 'Produto e preços sincronizados com sucesso no Stripe!',
         });
@@ -245,9 +251,9 @@ app.post('/api/stripe/provision-product', async (_req, res) => {
       },
       prices: {
         pro: { id: 'price_nutrilense_pro_20scans', amount: 2490, currency: 'brl', limit: '20 scans/mês' },
-        plus: { id: 'price_nutrilense_plus_unlimited', amount: 4990, currency: 'brl', limit: 'Scans Ilimitados' },
+        plus: { id: 'price_nutrilense_plus_60scans', amount: 4990, currency: 'brl', limit: '60 scans/mês' },
       },
-      message: 'Produto NutriLense AI e planos (Pro: 20 scans e Plus: Ilimitado) prontos para transacionar no Stripe!',
+      message: 'Produto NutriLense AI e planos (Pro: 20 scans e Plus: 60 scans) prontos para transacionar no Stripe!',
     });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
@@ -256,27 +262,31 @@ app.post('/api/stripe/provision-product', async (_req, res) => {
 
 app.post('/api/stripe/create-checkout-session', async (req, res) => {
   try {
-    const { planId, customerEmail } = req.body;
+    const { planId, customerEmail, currency = 'brl' } = req.body;
     const selectedPlan = STRIPE_PLANS.find((p) => p.id === planId);
 
     if (!selectedPlan || selectedPlan.id === 'free') {
       return res.status(400).json({ error: 'Plano inválido para checkout' });
     }
 
+    const isUS = currency === 'usd';
+
     // If real Stripe credentials configured
     if (stripe && process.env.APP_URL) {
       try {
+        const stripeCurrency = isUS ? 'usd' : 'brl';
+        const amount = isUS ? selectedPlan.amountUsd : selectedPlan.amountBrl;
         const session = await stripe.checkout.sessions.create({
           customer_email: customerEmail || undefined,
           line_items: [
             {
               price_data: {
-                currency: 'brl',
+                currency: stripeCurrency,
                 product_data: {
                   name: `NutriLense AI — ${selectedPlan.name}`,
                   description: `${selectedPlan.monthlyLimitText} — Nutrição Inteligente por IA`,
                 },
-                unit_amount: selectedPlan.amount,
+                unit_amount: amount,
                 recurring: { interval: 'month' },
               },
               quantity: 1,
@@ -294,11 +304,12 @@ app.post('/api/stripe/create-checkout-session', async (req, res) => {
     }
 
     // Graceful simulation mode (Instant sandbox checkout for preview/development)
+    const priceDisplay = isUS ? selectedPlan.priceUsd : selectedPlan.priceBrl;
     return res.json({
       success: true,
       simulated: true,
       planId: selectedPlan.id,
-      message: `Plano ${selectedPlan.name} (${selectedPlan.price}/mês) ativado com sucesso! Limite atualizado para ${selectedPlan.monthlyLimitText}.`,
+      message: `Plano ${selectedPlan.name} (${priceDisplay}/mês) ativado com sucesso! Limite atualizado para ${selectedPlan.monthlyLimitText}.`,
     });
   } catch (err: any) {
     console.error('Error in /api/stripe/create-checkout-session:', err);

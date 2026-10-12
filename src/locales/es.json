@@ -1,0 +1,344 @@
+{
+  "profile": {
+    "title": "Perfil, Metas y Logros",
+    "save": "Guardar Cambios",
+    "saved": "¡Guardado!",
+    "settings": "Ajustes Personales",
+    "cloudSync": "Sincronización en la Nube Activa",
+    "connectCloud": "Conecta tu Cuenta para Sincronización en la Nube",
+    "cloudDesc": "Tus escaneos de etiquetas, restricciones dietéticas y metas nutricionales se guardan de forma segura en Firebase Cloud Firestore.",
+    "connectDesc": "Tus datos están guardados localmente en este navegador. Inicia sesión con Google para respaldar tu historial, restricciones y logros en la nube de forma persistente.",
+    "disconnect": "Desconectar Cuenta de Google",
+    "connect": "Conectar con Google",
+    "achievements": {
+      "title": "Sistema de Logros y Gamificación",
+      "subtitle": "Medallas de Hábitos y Metas Cumplidas",
+      "unlocked": "Desbloqueadas",
+      "conquered": "Conquistada"
+    },
+    "data": {
+      "title": "Datos del Usuario",
+      "name": "Nombre Completo",
+      "email": "Correo Electrónico Registrado"
+    },
+    "dietary": {
+      "title": "Restricciones Alimentarias y Condiciones de Salud",
+      "desc": "Selecciona tus restricciones. El escáner de IA te alertará de inmediato al detectar ingredientes incompatibles."
+    },
+    "nutriGoals": {
+      "title": "Metas Diarias de Macronutrientes",
+      "calories": "Calorías (kcal)",
+      "protein": "Proteínas (g)",
+      "carbs": "Carbohidratos (g)",
+      "fat": "Grasas (g)"
+    },
+    "planAccount": {
+      "title": "Configuración de Cuenta y Plan",
+      "changePlan": "Cambiar Plan",
+      "editData": "Editar Datos",
+      "editDesc": "Guardar cambios en el perfil",
+      "cancelPlan": "Cancelar Plan",
+      "cancelDesc": "Volver al plan gratuito",
+      "deleteAccount": "Eliminar Cuenta",
+      "deleteDesc": "Borrar todos los datos y la cuenta"
+    }
+  },
+  "navbar": {
+    "home": "Inicio",
+    "history": "Historial y Diario",
+    "reports": "Informes PDF",
+    "nutritionists": "Nutricionistas",
+    "profile": "Perfil y Restricciones",
+    "scan": "Escanear Etiqueta",
+    "scans": "Escaneos",
+    "languageTooltip": "Cambiar idioma",
+    "loginTooltip": "Iniciar sesión con Google (Sincronizar)",
+    "scanTooltip": "Escanear etiqueta de producto",
+    "pwaTooltip": "Instalar aplicación (PWA)",
+    "profileTooltip": "Mi cuenta y perfil"
+  },
+  "landing": {
+    "hero": {
+      "badge": "Inteligencia Nutricional por IA y Lectura de Etiquetas en Vivo",
+      "title": "Descubre lo que está <1>oculto</1> en las etiquetas del supermercado.",
+      "subtitle": "Apunta la cámara a cualquier producto. NutriLense AI identifica azúcares ocultos, aditivos químicos nocivos, alertas para tus restricciones e indica alternativas más saludables al instante.",
+      "scanNow": "Escanear Etiqueta Ahora",
+      "viewReport": "Ver Informe Mensual en PDF",
+      "feature1": "Lectura por Cámara en Segundos",
+      "feature2": "Alertas de Lactosa, Gluten y Sodio",
+      "feature3": "Mapeo de Aditivos Nocivos",
+      "feature4": "Sugerencias de Cambios Saludables"
+    },
+    "howItWorks": {
+      "badge": "Cómo Funciona",
+      "title": "Alimentación consciente en 3 simples pasos",
+      "step1": {
+        "title": "Apunta la Cámara",
+        "desc": "Toma una foto de la lista de ingredientes o de la tabla nutricional en el supermercado, o escribe el código de barras EAN."
+      },
+      "step2": {
+        "title": "Análisis Instantáneo por IA",
+        "desc": "La inteligencia artificial traduce nombres químicos complejos, calcula el NutriScore (A a E) e identifica el grado de procesamiento."
+      },
+      "step3": {
+        "title": "Alertas y Sustituciones",
+        "desc": "Recibe avisos inmediatos si el producto viola tus restricciones y descubre alternativas más saludables para tu carrito."
+      }
+    },
+    "features": {
+      "badge": "Funcionalidades de la App",
+      "title": "Todo para proteger tu salud y la de tu familia",
+      "item1": {
+        "title": "Escáner Visual y Código de Barras",
+        "desc": "Lectura ultrarrápida tanto de fotos de etiquetas como de códigos EAN-13, funcionando en cualquier dispositivo."
+      },
+      "item2": {
+        "title": "Filtro de Restricciones",
+        "desc": "Alertas inmediatas para celíacos, intolerantes a la lactosa, hipertensos (alto sodio), diabéticos, veganos y alérgicos."
+      },
+      "item3": {
+        "title": "Informes PDF Mensuales",
+        "desc": "Monitorea tu diario de consumo de 30 días y descarga un informe profesional en PDF para llevar a tus citas nutricionales."
+      },
+      "item4": {
+        "title": "Nube y Google Auth",
+        "desc": "Persistencia segura en la nube con Cloud Firestore e inicio de sesión con Google en 1 clic. Datos y medallas sincronizados en tiempo real."
+      }
+    },
+    "comparison": {
+      "badge": "Demostración Interactiva",
+      "title": "Compara la diferencia entre un ultraprocesado y una opción saludable",
+      "subtitle": "Selecciona un producto a continuación para simular el resultado del escáner de NutriLense AI:",
+      "tabSoda": "🥤 Refresco Cola Zero vs. Kombucha Natural",
+      "tabYogurt": "🥛 Yogur Proteico Natural vs. Yogur Saborizado",
+      "sodaBadBadge": "Ultraprocesado NOVA 4",
+      "sodaBadTitle": "Refresco Cola Zero",
+      "sodaBadDesc": "Aditivos Químicos Sintéticos",
+      "sodaBadHarmTitle": "Aditivos Nocivos Detectados:",
+      "sodaBadHarm1": "Colorante Caramelo IV (E150d) — alto riesgo carcinogénico",
+      "sodaBadHarm2": "Ácido Fosfórico (E338) — dificulta la absorción de calcio",
+      "sodaBadHarm3": "Edulcorantes Artificiales (Sucralosa y Acesulfamo K)",
+      "sodaGoodBadge": "Alimento Natural / Probiótico",
+      "sodaGoodTitle": "Kombucha Orgánica de Jengibre",
+      "sodaGoodDesc": "Bebida Fermentada Natural",
+      "sodaGoodHarmTitle": "Beneficios Nutricionales:",
+      "sodaGoodHarm1": "Probióticos vivos para la salud de la microbiota intestinal",
+      "sodaGoodHarm2": "Cero aditivos, colorantes sintéticos o conservantes",
+      "sodaGoodHarm3": "Gasificación 100% natural",
+      "yogurtGoodBadge": "Mínimamente Procesado",
+      "yogurtGoodTitle": "Yogur Natural Proteico 20g",
+      "yogurtGoodDesc": "Solo 3 Ingredientes Legítimos",
+      "yogurtGoodHarmTitle": "Aspectos Nutricionales Destacados (TACO):",
+      "yogurtGoodHarm1": "20g de proteína de suero de alto valor biológico",
+      "yogurtGoodHarm2": "157mg de Calcio por porción (tabla oficial UNICAMP)",
+      "yogurtGoodHarm3": "Sin azúcares añadidos, almidón ni espesantes",
+      "yogurtBadBadge": "Ultraprocesado Reconstituido",
+      "yogurtBadTitle": "Postre Lácteo Sabor Fresa",
+      "yogurtBadDesc": "Saborizante Artificial y Azúcar Oculto",
+      "yogurtBadHarmTitle": "Azúcar Oculto y Aditivos:",
+      "yogurtBadHarm1": "Contiene 18g de azúcar añadido por porción, jarabe de glucosa, colorante carmín y espesante goma guar.",
+      "testCamera": "Probar Escáner con tu Cámara"
+    },
+    "pricing": {
+      "badge": "Stripe Checkout Oficial • Producto NutriLense AI",
+      "title": "Planes Transparentes y Cuota Inteligente de Lecturas",
+      "subtitle": "Comienza con la prueba gratuita de 2 escaneos, elige el <1>Plan Pro</1> con 20 escaneos al mes para compras habituales o aprovecha <2>60 Escaneos al mes en el Plan Plus</2> por R$ 49,90/mes.",
+      "simTitle": "Simulador de Uso en el Supermercado:",
+      "sim2": "Prueba rápida",
+      "sim20": "Perfil Compras Semanales (~20 escaneos/mes)",
+      "sim60": "Perfil Diario / Familia / Dieta Activa (~60 escaneos/mes)",
+      "btn2": "2 Escaneos",
+      "btn2Sub": "Prueba Gratis",
+      "btn20": "20 Escaneos/mes",
+      "btn20Sub": "Recomendado: Pro",
+      "btn60": "60 Escaneos/mes",
+      "btn60Sub": "Recomendado: Plus",
+      "free": {
+        "badge": "Prueba Gratuita",
+        "title": "Gratuito",
+        "active": "Plan Activo",
+        "noCard": "Sin Tarjeta",
+        "price": "R$ 0,00",
+        "period": "/mes",
+        "pill": "2 escaneos gratuitos de prueba",
+        "item1": "2 lecturas completas de etiquetas por cámara",
+        "item2": "Detección de azúcares ocultos y aditivos nocivos",
+        "item3": "Alertas de lactosa, gluten y sodio",
+        "item4": "Respaldado por la Tabla TACO (UNICAMP)",
+        "item5": "Sin historial prolongado ni informes mensuales",
+        "btnActive": "Probar Escáner Gratis",
+        "btnSwitch": "Volver a Gratuito"
+      },
+      "pro": {
+        "badge": "Compras de la Semana",
+        "title": "Plan Pro",
+        "active": "Plan Activo",
+        "quota": "Cuota Mensual",
+        "price": "R$ 24,90",
+        "period": "/mes",
+        "pill": "Límite de 20 Escaneos al mes",
+        "item1": "20 lecturas de etiquetas al mes (cámara y código de barras)",
+        "item2": "Mapeo profundo de alérgenos y conservantes",
+        "item3": "Diario alimentario con historial de 30 días",
+        "item4": "Sugerencias de sustituciones saludables por IA",
+        "item5": "Generación de informes mensuales en PDF",
+        "btnActive": "Plan Actual (Renovar)",
+        "btnSubscribe": "Suscribirse a Pro con Stripe (R$ 24,90)"
+      },
+      "plus": {
+        "badge": "Uso Avanzado / Familia",
+        "popular": "Más Elegido • 60 Escaneos",
+        "title": "Plan Plus",
+        "price": "R$ 49,90",
+        "period": "/mes",
+        "pill": "Cuota de 60 ESCANEOS al mes",
+        "item1": "60 lecturas de etiquetas al mes (cámara y código de barras)",
+        "item2": "IA Gemini 3.8 Flash prioritaria (Tabla TACO oficial)",
+        "item3": "Sustituciones saludables personalizadas para cada producto",
+        "item4": "Informes ejecutivos mensuales en PDF con gráficos Recharts",
+        "item5": "Soporte prioritario y acceso anticipado a novedades",
+        "btnActive": "Plan Actual (Activo)",
+        "btnSubscribe": "Suscribirse a Plus con Stripe (60 Escaneos • R$ 49,90)"
+      }
+    },
+    "mapsBanner": {
+      "badge": "Integración con Google Maps",
+      "title": "Encuentra al Nutricionista Más Cercano a tu Ubicación",
+      "desc": "Combinamos la inteligencia artificial del escáner con la orientación humana personalizada. Descubre clínicas y consultorios certificados, filtra por especialidad (enfermedades crónicas, deportiva, funcional o control de peso) y traza la ruta en Google Maps con un clic.",
+      "btn": "Explorar Nutricionistas en el Mapa",
+      "gps": "GPS en tiempo real + base de datos georreferenciada",
+      "sideBadge": "CONECTIVIDAD CLÍNICA",
+      "sideDesc": "Comparte tu diario nutricional NutriLense y datos de la Tabla TACO directamente con tu nutricionista antes de la consulta.",
+      "platform": "Google Maps Platform",
+      "radius": "Radio hasta 50km"
+    },
+    "faq": {
+      "badge": "Resuelve tus Dudas",
+      "title": "Preguntas Frecuentes",
+      "subtitle": "Todo lo que necesitas saber sobre el funcionamiento del escáner, auditoría científica TACO, modo sin conexión y planes de acceso.",
+      "items": [
+        {
+          "category": "Restricciones y Salud",
+          "q": "¿Cómo analiza la app las restricciones?",
+          "a": "NutriLense AI compara la lista completa de ingredientes y la composición centesimal del producto contra tu perfil personalizado (lactosa, gluten, sodio elevado para hipertensos, azúcares ocultos para diabéticos o alergias alimentarias). Mediante la visión computacional del modelo Gemini, el sistema identifica derivados sutiles, aditivos camuflados y advertencias de contaminación cruzada, disparando alertas inmediatas destacadas en rojo si existe alguna incompatibilidad con tu dieta."
+        },
+        {
+          "category": "Base Científica y Precisión",
+          "q": "¿Es confiable la base de datos?",
+          "a": "Sí, 100% fundamentada en la ciencia. Además de la inteligencia artificial de lectura de etiquetas, la app utiliza la Tabla Brasileña de Composición de Alimentos — TACO (NEPA/UNICAMP 4ª Edición) como referencia analítica secundaria. Esto permite auditar la densidad calórica, distribución de macronutrientes (proteínas, carbohidratos y grasas) y niveles de sodio real contra matrices biológicas oficiales, detectando divergencias o datos engañosos de la industria."
+        },
+        {
+          "category": "Conectividad y PWA",
+          "q": "¿Puedo usar el escáner sin conexión a internet?",
+          "a": "El historial y la consulta de productos previamente escaneados funcionan perfectamente sin conexión gracias a la arquitectura Progressive Web App (PWA) con Service Worker y caché local persistente. Si estás en un supermercado con poca señal móvil, puedes revisar todos tus alimentos analizados con anterioridad. Para escanear un nuevo producto con visión multimodal Gemini y validación TACO en tiempo real, se utiliza una conexión momentánea."
+        },
+        {
+          "category": "Suscripción y Stripe",
+          "q": "¿Cómo cancelo mi suscripción?",
+          "a": "Puedes cancelar tu suscripción en cualquier momento con un solo clic, sin trámites engorrosos ni cargos de cancelación. Toda la facturación se gestiona de forma segura a través de Stripe. Al cancelar, mantienes acceso total a los beneficios de tu plan Pro o Plus hasta el final de tu período mensual ya contratado, regresando automáticamente al plan gratuito sin cobros posteriores."
+        },
+        {
+          "category": "Reconocimiento y Cámara",
+          "q": "¿El escáner funciona con cualquier producto del supermercado?",
+          "a": "¡Sí! NutriLense AI lee tanto fotos de la tabla nutricional y lista de ingredientes como códigos de barras estándar EAN-13 en productos nacionales e internacionales. La IA determina la clasificación NOVA (nivel de ultraprocesamiento de 1 a 4), calcula la calificación Nutri-Score (A a E) y detecta aditivos nocivos en pocos segundos."
+        },
+        {
+          "category": "Instalación Instantánea",
+          "q": "¿Necesito descargarlo desde Google Play o Apple App Store?",
+          "a": "¡No es necesario descargar desde las tiendas de aplicaciones! NutriLense AI es una PWA homologada: puedes instalarla directamente desde tu navegador (en Safari de iPhone tocando en \"Compartir\" → \"Agregar a Inicio\"; o en Chrome/Android tocando el botón \"Instalar App\" en la barra superior). Se abre a pantalla completa con la experiencia fluida de una app nativa."
+        },
+        {
+          "category": "Informes Ejecutivos",
+          "q": "¿Puedo exportar informes nutricionales en PDF para llevar a mi médico o nutricionista?",
+          "a": "¡Sí! En la pestaña \"Informes PDF\", puedes visualizar dashboards de evolución semanal de macronutrientes y calorías con gráficos interactivos Recharts y generar con un solo clic informes ejecutivos para descargar o imprimir, ideales para control médico o seguimiento deportivo."
+        }
+      ]
+    },
+    "footer": {
+      "desc": "Plataforma de inteligencia nutricional multimodal que combina visión computacional Gemini, estándar científico TACO (UNICAMP) y navegación sin conexión PWA.",
+      "highPerf": "Desarrollado con Ingeniería de Alto Rendimiento",
+      "portfolioTitle": "Desarrollador y Portafolio",
+      "portfolioDesc": "Conoce otros proyectos, soluciones de software y arquitecturas completas creadas por la autora de NutriLense AI:",
+      "portfolioBtn": "Visitar Portafolio Aline DEV",
+      "contactTitle": "Contacto y Soporte",
+      "contactDesc": "Consultas comerciales, alianzas, soporte técnico o comentarios sobre NutriLense AI:",
+      "contactEmail": "Correo Electrónico de Contacto",
+      "copyright": "Todos los derechos reservados.",
+      "official": "Portafolio Oficial:"
+    }
+  },
+  "modals": {
+    "scanner": {
+      "title": "Escáner de Alimentos",
+      "subtitle": "Etiqueta o Foto de Plato",
+      "packaged": "Industrializado",
+      "meal": "Plato Preparado",
+      "cameraError": "Cámara no disponible en el navegador o permiso denegado. Puedes subir una foto de la etiqueta o probar con los códigos numéricos a continuación.",
+      "cameraStarting": "Iniciando cámara...",
+      "aiAnalyzing": "Auditando con Gemini IA...",
+      "tacoValidation": "Validación TACO (UNICAMP) Activa",
+      "analyzeNow": "Analizar {{category}} Ahora",
+      "label": "Etiqueta",
+      "dish": "Plato",
+      "uploadTooltip": "Subir foto de la galería",
+      "orBarcode": "O Escribe el Código de Barras EAN",
+      "barcodePlaceholder": "Ej: 7891000100103",
+      "search": "Buscar",
+      "examples": "Ejemplos:",
+      "presetYogurt": "🥛 Yogur Proteico (Saludable - A)",
+      "presetSoda": "🥤 Refresco Cola (Nocivo - E)",
+      "readError": "No se pudo leer la etiqueta/plato. Inténtalo de nuevo con mayor nitidez e iluminación.",
+      "generalError": "Ocurrió un error al procesar la lectura por IA."
+    },
+    "swaps": {
+      "title": "Sustituciones Saludables por IA",
+      "subtitle": "Cambia a opciones con mejor NutriScore y cero aditivos nocivos",
+      "currentProduct": "Producto Actual:",
+      "score": "Puntuación {{score}}/100",
+      "recTitle": "Alternativas Recomendadas para tu Perfil:",
+      "option": "Opción #{{num}}",
+      "alreadyBest": "¡Este producto ya cuenta con una de las mejores calificaciones de la categoría!",
+      "understood": "Entendido"
+    },
+    "demoLimit": {
+      "monthlyReached": "Cuota Mensual Alcanzada",
+      "demoReached": "Límite de Prueba Alcanzado",
+      "limitTitle": "¡Alcanzaste el límite de {{limit}} lecturas {{period}}!",
+      "freePeriod": "gratuitas",
+      "monthPeriod": "de este mes",
+      "descPro": "Mejora al plan Plus para obtener 60 escaneos al mes con IA prioritaria.",
+      "descFree": "Elige el plan Pro (20 escaneos al mes) o Plus (60 escaneos al mes) para continuar.",
+      "proTitle": "Plan Pro",
+      "proPrice": "R$ 24,90",
+      "proPeriod": "/mes",
+      "proSub": "20 escaneos por mes",
+      "pro1": "Historial de 30 días",
+      "pro2": "Cambios saludables por IA",
+      "pro3": "Informe en PDF",
+      "proCurrent": "Plan Actual",
+      "proSubscribe": "Suscribirse a Pro",
+      "plusBadge": "60 Escaneos",
+      "plusTitle": "Plan Plus",
+      "plusPrice": "R$ 49,90",
+      "plusPeriod": "/mes",
+      "plusSub": "60 escaneos por mes",
+      "plus1": "60 lecturas al mes",
+      "plus2": "IA prioritaria Tabla TACO",
+      "plus3": "Informes PDF + Recharts",
+      "plusCurrent": "Plan Actual",
+      "plusSubscribe": "Suscribirse a Plus",
+      "secureStripe": "Pago seguro procesado a través de Stripe",
+      "continueBrowsing": "Continuar Navegando"
+    }
+  },
+  "pwa": {
+    "installApp": "Instalar App",
+    "installIOS": "Instalar en iOS",
+    "installTitle": "Instalar en iPhone / iPad",
+    "installSubtitle": "Sigue las instrucciones de Safari",
+    "step1": "1. Toca el botón Compartir en la barra de Safari.",
+    "step2": "2. Desplázate hacia abajo y selecciona Agregar a Inicio.",
+    "understood": "Entendido",
+    "genericAlert": "Para instalar NutriLense AI como App: haz clic en los tres puntos (...) en la esquina de tu navegador (Chrome/Edge/Brave) y selecciona \"Instalar NutriLense AI\" o \"Agregar a Pantalla de Inicio\"."
+  }
+}

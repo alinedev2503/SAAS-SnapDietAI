@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import {
   Camera,
   Sparkles,
@@ -43,6 +44,7 @@ interface LandingPageProps {
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavigateToTab }) => {
+  const { t } = useTranslation();
   const { config, currentPlan, setPlan, subscribeStripePlan } = useWhiteLabel();
 
   // Interactive comparison widget state
@@ -95,15 +97,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
           
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
             <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Inteligência Nutricional por IA & Leitura de Rótulos ao Vivo</span>
+            <span>{t('landing.hero.badge')}</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.15] text-balance">
-            Descubra o que está <span className="text-emerald-600 dark:text-emerald-400 underline decoration-emerald-300/60 decoration-wavy underline-offset-8">escondido</span> nos rótulos do supermercado.
+            <Trans
+              i18nKey="landing.hero.title"
+              components={{ 1: <span className="text-emerald-600 dark:text-emerald-400 underline decoration-emerald-300/60 decoration-wavy underline-offset-8" /> }}
+            />
           </h1>
 
           <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed text-balance">
-            Aponte a câmera para qualquer produto. O NutriLense AI identifica açúcares ocultos, aditivos químicos nocivos, alertas para suas restrições e indica substituições mais saudáveis instantaneamente.
+            {t('landing.hero.subtitle')}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -112,7 +117,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
               className="w-full sm:w-auto px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base rounded-2xl shadow-lg shadow-emerald-600/25 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2.5"
             >
               <Camera className="w-5 h-5" />
-              <span>Escanear Rótulo Agora</span>
+              <span>{t('landing.hero.scanNow')}</span>
             </button>
 
             <button
@@ -120,7 +125,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
               className="w-full sm:w-auto px-6 py-4 bg-white dark:bg-slate-800 text-slate-800 dark:text-white font-semibold text-sm rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer flex items-center justify-center gap-2"
             >
               <FileBarChart className="w-4 h-4 text-emerald-600" />
-              <span>Ver Relatório Mensal em PDF</span>
+              <span>{t('landing.hero.viewReport')}</span>
             </button>
           </div>
 
@@ -128,19 +133,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
           <div className="pt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 dark:text-slate-400 font-medium">
             <span className="flex items-center gap-1.5">
               <Check className="w-4 h-4 text-emerald-500" />
-              Leitura por Câmera em Segundos
+              {t('landing.hero.feature1')}
             </span>
             <span className="flex items-center gap-1.5">
               <Check className="w-4 h-4 text-emerald-500" />
-              Alertas para Lactose, Glúten & Sódio
+              {t('landing.hero.feature2')}
             </span>
             <span className="flex items-center gap-1.5">
               <Check className="w-4 h-4 text-emerald-500" />
-              Mapeamento de Aditivos Nocivos
+              {t('landing.hero.feature3')}
             </span>
             <span className="flex items-center gap-1.5">
               <Check className="w-4 h-4 text-emerald-500" />
-              Sugestão de Trocas Saudáveis
+              {t('landing.hero.feature4')}
             </span>
           </div>
 
@@ -150,8 +155,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
       {/* How It Works Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="text-center space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Como Funciona</span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Alimentação consciente em 3 passos simples</h2>
+          <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">{t('landing.howItWorks.badge')}</span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">{t('landing.howItWorks.title')}</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -160,9 +165,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center mx-auto text-lg font-bold">
               1
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Aponte a Câmera</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('landing.howItWorks.step1.title')}</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Tire uma foto da lista de ingredientes ou da tabela nutricional no supermercado, ou digite o código de barras EAN.
+              {t('landing.howItWorks.step1.desc')}
             </p>
           </div>
 
@@ -170,9 +175,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center mx-auto text-lg font-bold">
               2
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Análise Instantânea por IA</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('landing.howItWorks.step2.title')}</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              A inteligência artificial traduz nomes químicos complexos, calcula o NutriScore (A a E) e identifica o grau de processamento.
+              {t('landing.howItWorks.step2.desc')}
             </p>
           </div>
 
@@ -180,9 +185,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center mx-auto text-lg font-bold">
               3
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Alertas & Substituições</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('landing.howItWorks.step3.title')}</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Receba avisos instantâneos se o produto violar suas restrições e descubra alternativas mais saudáveis para colocar no carrinho.
+              {t('landing.howItWorks.step3.desc')}
             </p>
           </div>
 
@@ -194,11 +199,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
         <div className="max-w-3xl space-y-3 text-center sm:text-left">
           <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5 justify-center sm:justify-start">
             <Scale className="w-4 h-4" />
-            Demonstração Interativa
+            {t('landing.comparison.badge')}
           </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold">Veja a diferença entre um ultraprocessado e uma opção saudável</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold">{t('landing.comparison.title')}</h2>
           <p className="text-xs sm:text-sm text-slate-300">
-            Selecione o produto abaixo para simular o resultado do scanner do NutriLense AI:
+            {t('landing.comparison.subtitle')}
           </p>
         </div>
 
@@ -210,7 +215,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
               activeDemo === 'soda' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
             }`}
           >
-            🥤 Refrigerante Cola Zero vs. Kombucha Natural
+            {t('landing.comparison.tabSoda')}
           </button>
           <button
             onClick={() => setActiveDemo('yogurt')}
@@ -218,7 +223,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
               activeDemo === 'yogurt' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
             }`}
           >
-            🥛 Iogurte Proteico Natural vs. Iogurte Aromatizado
+            {t('landing.comparison.tabYogurt')}
           </button>
         </div>
 
@@ -230,9 +235,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <div className="p-5 bg-white rounded-2xl border-2 border-rose-200 space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] font-bold text-rose-600 uppercase tracking-wider">Ultraprocessado NOVA 4</span>
-                  <h4 className="text-base font-bold">Refrigerante Cola Zero</h4>
-                  <span className="text-xs text-slate-500">Aditivos Químicos Sintéticos</span>
+                  <span className="text-[10px] font-bold text-rose-600 uppercase tracking-wider">{t('landing.comparison.sodaBadBadge')}</span>
+                  <h4 className="text-base font-bold">{t('landing.comparison.sodaBadTitle')}</h4>
+                  <span className="text-xs text-slate-500">{t('landing.comparison.sodaBadDesc')}</span>
                 </div>
                 <div className="px-3 py-1 bg-rose-600 text-white font-black rounded-lg text-sm">
                   NutriScore E (32/100)
@@ -242,12 +247,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
               <div className="p-2.5 bg-rose-50 rounded-xl text-xs text-rose-800 font-medium space-y-1">
                 <div className="font-bold flex items-center gap-1 text-rose-900">
                   <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
-                  Aditivos Nocivos Detectados:
+                  {t('landing.comparison.sodaBadHarmTitle')}
                 </div>
                 <ul className="list-disc pl-4 space-y-0.5 text-[11px]">
-                  <li>Corante Caramelo IV (E150d) — risco carcinogênico alto</li>
-                  <li>Ácido Fosfórico (E338) — prejudica absorção de cálcio</li>
-                  <li>Adoçantes Artificiais (Sucralose & Acessulfame K)</li>
+                  <li>{t('landing.comparison.sodaBadHarm1')}</li>
+                  <li>{t('landing.comparison.sodaBadHarm2')}</li>
+                  <li>{t('landing.comparison.sodaBadHarm3')}</li>
                 </ul>
               </div>
             </div>
@@ -256,9 +261,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <div className="p-5 bg-white rounded-2xl border-2 border-emerald-500 space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">In Natura / Probiótico</span>
-                  <h4 className="text-base font-bold">Kombucha Orgânica de Gengibre</h4>
-                  <span className="text-xs text-slate-500">Bebida Fermentada Natural</span>
+                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">{t('landing.comparison.sodaGoodBadge')}</span>
+                  <h4 className="text-base font-bold">{t('landing.comparison.sodaGoodTitle')}</h4>
+                  <span className="text-xs text-slate-500">{t('landing.comparison.sodaGoodDesc')}</span>
                 </div>
                 <div className="px-3 py-1 bg-emerald-600 text-white font-black rounded-lg text-sm">
                   NutriScore A (88/100)
@@ -268,12 +273,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
               <div className="p-2.5 bg-emerald-50 rounded-xl text-xs text-emerald-800 font-medium space-y-1">
                 <div className="font-bold flex items-center gap-1 text-emerald-900">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  Benefícios Nutricionais:
+                  {t('landing.comparison.sodaGoodHarmTitle')}
                 </div>
                 <ul className="list-disc pl-4 space-y-0.5 text-[11px]">
-                  <li>Probióticos vivos para a saúde da microbiota intestinal</li>
-                  <li>Zero aditivos, corantes sintéticos ou conservantes</li>
-                  <li>Gaseificação 100% natural</li>
+                  <li>{t('landing.comparison.sodaGoodHarm1')}</li>
+                  <li>{t('landing.comparison.sodaGoodHarm2')}</li>
+                  <li>{t('landing.comparison.sodaGoodHarm3')}</li>
                 </ul>
               </div>
             </div>
@@ -286,9 +291,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <div className="p-5 bg-white rounded-2xl border-2 border-emerald-500 space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Minimamente Processado</span>
-                  <h4 className="text-base font-bold">Iogurte Natural Proteico 20g</h4>
-                  <span className="text-xs text-slate-500">Apenas 3 Ingredientes Legítimos</span>
+                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">{t('landing.comparison.yogurtGoodBadge')}</span>
+                  <h4 className="text-base font-bold">{t('landing.comparison.yogurtGoodTitle')}</h4>
+                  <span className="text-xs text-slate-500">{t('landing.comparison.yogurtGoodDesc')}</span>
                 </div>
                 <div className="px-3 py-1 bg-emerald-600 text-white font-black rounded-lg text-sm">
                   NutriScore A (92/100)
@@ -298,9 +303,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
               <div className="p-2.5 bg-emerald-50 rounded-xl text-xs text-emerald-800 font-medium space-y-1">
                 <div className="font-bold flex items-center gap-1 text-emerald-900">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  Ingredientes Limpos:
+                  {t('landing.comparison.yogurtGoodHarmTitle')}
                 </div>
-                <p className="text-[11px]">Leite desnatado, fermentos lácteos vivos e proteína de soro de leite. Zero açúcares adicionados.</p>
+                <ul className="list-disc pl-4 space-y-0.5 text-[11px]">
+                  <li>{t('landing.comparison.yogurtGoodHarm1')}</li>
+                  <li>{t('landing.comparison.yogurtGoodHarm2')}</li>
+                  <li>{t('landing.comparison.yogurtGoodHarm3')}</li>
+                </ul>
               </div>
             </div>
 
@@ -308,9 +317,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <div className="p-5 bg-white rounded-2xl border-2 border-rose-200 space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] font-bold text-rose-600 uppercase tracking-wider">Ultraprocessado NOVA 4</span>
-                  <h4 className="text-base font-bold">Iogurte Aromatizado Morango</h4>
-                  <span className="text-xs text-slate-500">Açúcares Ocultos & Espessantes</span>
+                  <span className="text-[10px] font-bold text-rose-600 uppercase tracking-wider">{t('landing.comparison.yogurtBadBadge')}</span>
+                  <h4 className="text-base font-bold">{t('landing.comparison.yogurtBadTitle')}</h4>
+                  <span className="text-xs text-slate-500">{t('landing.comparison.yogurtBadDesc')}</span>
                 </div>
                 <div className="px-3 py-1 bg-amber-500 text-white font-black rounded-lg text-sm">
                   NutriScore D (42/100)
@@ -320,9 +329,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
               <div className="p-2.5 bg-rose-50 rounded-xl text-xs text-rose-800 font-medium space-y-1">
                 <div className="font-bold flex items-center gap-1 text-rose-900">
                   <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
-                  Alertas do Rótulo:
+                  {t('landing.comparison.yogurtBadHarmTitle')}
                 </div>
-                <p className="text-[11px]">Contém 18g de açúcar adicionado por porção, xarope de glicose, corante carmim de cochonilha e espessante goma guar.</p>
+                <p className="text-[11px]">{t('landing.comparison.yogurtBadHarm1')}</p>
               </div>
             </div>
 
@@ -335,7 +344,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs rounded-xl transition-all cursor-pointer inline-flex items-center gap-2"
           >
             <Camera className="w-4 h-4" />
-            <span>Testar Scanner com sua Câmera</span>
+            <span>{t('landing.comparison.testCamera')}</span>
           </button>
         </div>
       </section>
@@ -343,8 +352,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
       {/* Feature Deep Dive Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="text-center space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Recursos do Aplicativo</span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Tudo para proteger sua saúde e de sua família</h2>
+          <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">{t('landing.features.badge')}</span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">{t('landing.features.title')}</h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -353,9 +362,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center">
               <Camera className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Scanner Visual & Barcode</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('landing.features.item1.title')}</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Leitura ultrarrápida tanto da foto do rótulo quanto pelo código de barras EAN-13, funcionando perfeitamente em qualquer dispositivo.
+              {t('landing.features.item1.desc')}
             </p>
           </div>
 
@@ -363,9 +372,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center">
               <ShieldCheck className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Filtro de Restrições</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('landing.features.item2.title')}</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Alertas imediatos para celíacos, intolerantes a lactose, hipertensos (sódio elevado), diabéticos, veganos e alérgicos.
+              {t('landing.features.item2.desc')}
             </p>
           </div>
 
@@ -373,9 +382,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center">
               <FileBarChart className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Relatórios PDF Mensais</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('landing.features.item3.title')}</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Acompanhe seu diário de consumo de 30 dias e baixe um relatório profissional em PDF para levar às suas consultas nutricionais.
+              {t('landing.features.item3.desc')}
             </p>
           </div>
 
@@ -383,9 +392,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center">
               <Cloud className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Firestore & Google Auth</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('landing.features.item4.title')}</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Persistência segura em nuvem com Cloud Firestore e login Google em 1 clique. Seus dados e medalhas sincronizados em tempo real.
+              {t('landing.features.item4.desc')}
             </p>
           </div>
 
@@ -399,13 +408,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
         <div className="space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold text-emerald-700 dark:text-emerald-300">
             <Lock className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Stripe Checkout Oficial • Produto NutriLense AI</span>
+            <span>{t('landing.pricing.badge')}</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Planos Transparentes & Cota Inteligente de Leituras
+            {t('landing.pricing.title')}
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Comece na degustação gratuita com 2 scans, escolha o <strong>Plano Pro</strong> com cota de 20 scans no mês para compras rotineiras ou libere <strong>Scans Ilimitados no Plano Plus</strong> por R$ 49,90/mês.
+            <Trans
+              i18nKey="landing.pricing.subtitle"
+              components={{
+                1: <strong />,
+                2: <strong />,
+              }}
+            />
           </p>
         </div>
 
@@ -422,12 +437,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
               <Scale className="w-4 h-4 text-emerald-600" />
-              <span>Simulador de Uso no Supermercado:</span>
+              <span>{t('landing.pricing.simTitle')}</span>
             </div>
             <span className="text-[11px] font-medium text-slate-500">
-              {weeklyUsageEstimate <= 2 && 'Degustação rápida'}
-              {weeklyUsageEstimate > 2 && weeklyUsageEstimate <= 5 && 'Perfil Compras Semanais (~20 scans/mês)'}
-              {weeklyUsageEstimate > 5 && 'Perfil Diário / Família / Dieta Ativa (>20 scans/mês)'}
+              {weeklyUsageEstimate <= 2 && t('landing.pricing.sim2')}
+              {weeklyUsageEstimate > 2 && weeklyUsageEstimate <= 5 && t('landing.pricing.sim20')}
+              {weeklyUsageEstimate > 5 && t('landing.pricing.sim60')}
             </span>
           </div>
 
@@ -440,8 +455,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
                   : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
               }`}
             >
-              <div className="font-bold text-sm">2 Scans</div>
-              <div className="text-[10px] opacity-80">Degustação</div>
+              <div className="font-bold text-sm">{t('landing.pricing.btn2')}</div>
+              <div className="text-[10px] opacity-80">{t('landing.pricing.btn2Sub')}</div>
             </button>
 
             <button
@@ -452,8 +467,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
                   : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
               }`}
             >
-              <div className="font-bold text-sm">20 Scans/mês</div>
-              <div className="text-[10px] opacity-80">Recomendado: Pro</div>
+              <div className="font-bold text-sm">{t('landing.pricing.btn20')}</div>
+              <div className="text-[10px] opacity-80">{t('landing.pricing.btn20Sub')}</div>
             </button>
 
             <button
@@ -464,14 +479,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
                   : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
               }`}
             >
-              <div className="font-bold text-sm">Ilimitado</div>
-              <div className="text-[10px] opacity-80">Recomendado: Plus</div>
+              <div className="font-bold text-sm">{t('landing.pricing.btn60')}</div>
+              <div className="text-[10px] opacity-80">{t('landing.pricing.btn60Sub')}</div>
             </button>
           </div>
         </div>
 
         {/* 3 Pricing Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-5xl mx-auto items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 text-left max-w-5xl mx-auto items-stretch">
           
           {/* Card 1: Plano Gratuito */}
           <div className={`p-6 sm:p-7 bg-white dark:bg-slate-900 rounded-3xl border transition-all flex flex-col justify-between ${
@@ -479,52 +494,56 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
               ? 'border-slate-400 ring-2 ring-slate-300 dark:ring-slate-700 shadow-md'
               : 'border-slate-200/90 dark:border-slate-800 shadow-sm hover:border-slate-300'
           }`}>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
+            <div className="space-y-5 flex-1 flex flex-col">
+              {/* Header */}
+              <div className="flex items-start justify-between gap-2 min-h-[50px]">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Degustação</span>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Gratuito</h3>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-0.5">{t('landing.pricing.free.badge')}</span>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">{t('landing.pricing.free.title')}</h3>
                 </div>
                 {currentPlan === 'free' ? (
-                  <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold rounded-full">
-                    Plano Ativo
+                  <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold rounded-full shrink-0">
+                    {t('landing.pricing.free.active')}
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[10px] font-semibold rounded-full">
-                    Sem Cartão
+                  <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[10px] font-semibold rounded-full shrink-0">
+                    {t('landing.pricing.free.noCard')}
                   </span>
                 )}
               </div>
 
-              <div className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-mono">
-                R$ 0,00 <span className="text-xs font-normal text-slate-500">/mês</span>
+              {/* Price */}
+              <div className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-mono flex items-baseline gap-1">
+                {t('landing.pricing.free.price')} <span className="text-xs font-normal text-slate-500">{t('landing.pricing.free.period')}</span>
               </div>
               
-              <div className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-slate-500" />
-                <span>2 scans gratuitos de teste</span>
+              {/* Pill feature highlight */}
+              <div className="h-9 text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 shrink-0">
+                <CheckCircle2 className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                <span>{t('landing.pricing.free.pill')}</span>
               </div>
 
-              <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-2.5 pt-2">
+              {/* Features list */}
+              <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-2.5 pt-1 flex-1">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>2 leituras completas de rótulos via câmera</span>
+                  <span>{t('landing.pricing.free.item1')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Detecção de açúcares ocultos e aditivos nocivos</span>
+                  <span>{t('landing.pricing.free.item2')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Alertas para lactose, glúten e sódio</span>
+                  <span>{t('landing.pricing.free.item3')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Fundamentação pela Tabela TACO (UNICAMP)</span>
+                  <span>{t('landing.pricing.free.item4')}</span>
                 </li>
                 <li className="flex items-start gap-2 text-slate-400 dark:text-slate-500">
-                  <span className="w-4 h-4 flex items-center justify-center font-bold text-[10px] text-slate-400">✕</span>
-                  <span>Sem histórico prolongado ou relatórios mensais</span>
+                  <span className="w-4 h-4 flex items-center justify-center font-bold text-[10px] text-slate-400 shrink-0">✕</span>
+                  <span>{t('landing.pricing.free.item5')}</span>
                 </li>
               </ul>
             </div>
@@ -534,9 +553,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
                 setPlan('free');
                 onOpenScanner();
               }}
-              className="mt-8 w-full py-3.5 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 text-white dark:text-slate-900 font-bold text-xs rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm"
+              className="mt-6 w-full py-3.5 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 text-white dark:text-slate-900 font-bold text-xs rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm shrink-0"
             >
-              <span>{currentPlan === 'free' ? 'Testar Scanner Grátis' : 'Voltar para Gratuito'}</span>
+              <span>{currentPlan === 'free' ? t('landing.pricing.free.btnActive') : t('landing.pricing.free.btnSwitch')}</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -547,55 +566,58 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
               ? 'border-emerald-500 ring-2 ring-emerald-400 shadow-lg'
               : 'border-slate-200/90 dark:border-slate-800 shadow-md hover:border-emerald-400'
           }`}>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
+            <div className="space-y-5 flex-1 flex flex-col">
+              {/* Header */}
+              <div className="flex items-start justify-between gap-2 min-h-[50px]">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                    Compras da Semana
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block mb-0.5">
+                    {t('landing.pricing.pro.badge')}
                   </span>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Plano Pro</h3>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">{t('landing.pricing.pro.title')}</h3>
                 </div>
                 {currentPlan === 'pro' ? (
-                  <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full">
-                    Plano Ativo
+                  <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full shrink-0">
+                    {t('landing.pricing.pro.active')}
                   </span>
                 ) : (
-                  <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold rounded-full border border-emerald-200 dark:border-emerald-800">
-                    Cota Mensal
+                  <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold rounded-full border border-emerald-200 dark:border-emerald-800 shrink-0">
+                    {t('landing.pricing.pro.quota')}
                   </span>
                 )}
               </div>
 
-              <div className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-mono">
-                R$ 24,90 <span className="text-xs font-normal text-slate-500">/mês</span>
+              {/* Price */}
+              <div className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-mono flex items-baseline gap-1">
+                {t('landing.pricing.pro.price')} <span className="text-xs font-normal text-slate-500">{t('landing.pricing.pro.period')}</span>
               </div>
 
               {/* Destaque do Limite de 20 Scans */}
-              <div className="text-xs font-bold text-emerald-800 dark:text-emerald-200 bg-emerald-50 dark:bg-emerald-950/70 px-3 py-1.5 rounded-xl border border-emerald-300 dark:border-emerald-800 flex items-center gap-1.5">
+              <div className="h-9 text-xs font-bold text-emerald-800 dark:text-emerald-200 bg-emerald-50 dark:bg-emerald-950/70 px-3 rounded-xl border border-emerald-300 dark:border-emerald-800 flex items-center gap-1.5 shrink-0">
                 <Zap className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span>Limite de 20 Scans no mês</span>
+                <span>{t('landing.pricing.pro.pill')}</span>
               </div>
 
-              <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-2.5 pt-2">
+              {/* Features list */}
+              <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-2.5 pt-1 flex-1">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span><strong>20 leituras de rótulos por mês</strong> (câmera & código de barras)</span>
+                  <span>{t('landing.pricing.pro.item1')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Mapeamento profundo de alérgenos e conservantes</span>
+                  <span>{t('landing.pricing.pro.item2')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Diário alimentar com histórico de 30 dias</span>
+                  <span>{t('landing.pricing.pro.item3')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Sugestão de substituições saudáveis por IA</span>
+                  <span>{t('landing.pricing.pro.item4')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Geração de relatórios mensais em PDF</span>
+                  <span>{t('landing.pricing.pro.item5')}</span>
                 </li>
               </ul>
             </div>
@@ -603,60 +625,65 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <button
               onClick={() => handleSubscribe('pro')}
               disabled={subscribingPlan !== null}
-              className="mt-8 w-full py-3.5 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 text-white dark:text-slate-900 font-bold text-xs rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 shadow-md"
+              className="mt-6 w-full py-3.5 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 text-white dark:text-slate-900 font-bold text-xs rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 shadow-md shrink-0"
             >
               {subscribingPlan === 'pro' ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <CreditCard className="w-4 h-4" />
               )}
-              <span>{currentPlan === 'pro' ? 'Plano Atual (Renovar)' : 'Assinar Pro com Stripe (R$ 24,90)'}</span>
+              <span>{currentPlan === 'pro' ? t('landing.pricing.pro.btnActive') : t('landing.pricing.pro.btnSubscribe')}</span>
             </button>
           </div>
 
-          {/* Card 3: Plano Plus (Scans Ilimitados - R$ 49,90) */}
-          <div className="p-6 sm:p-7 bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 text-white rounded-3xl shadow-xl flex flex-col justify-between relative overflow-hidden border-2 border-emerald-400">
-            <span className="absolute top-4 right-4 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-extrabold rounded-full uppercase tracking-wider border border-white/30 shadow-sm">
-              Mais Escolhido • Sem Limites
+          {/* Card 3: Plano Plus (60 Scans no mês - R$ 49,90) */}
+          <div className="p-6 sm:p-7 pt-8 sm:pt-9 bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 text-white rounded-3xl shadow-xl flex flex-col justify-between relative overflow-hidden border-2 border-emerald-400">
+            {/* Top-right pinned badge close to top edge */}
+            <span className="absolute top-3 right-3 sm:top-3.5 sm:right-4 px-2.5 py-0.5 bg-white/20 backdrop-blur-md text-white text-[10px] font-extrabold rounded-full uppercase tracking-wider border border-white/30 shadow-xs z-10 whitespace-nowrap">
+              {t('landing.pricing.plus.popular')}
             </span>
 
-            <div className="space-y-4">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-200">
-                  Uso Irrestrito
+            <div className="space-y-5 flex-1 flex flex-col">
+              {/* Header */}
+              <div className="min-h-[50px] pr-28 sm:pr-32">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-200 block mb-0.5 whitespace-nowrap">
+                  {t('landing.pricing.plus.badge')}
                 </span>
-                <h3 className="text-xl sm:text-2xl font-black text-white">Plano Plus</h3>
+                <h3 className="text-xl font-bold text-white leading-tight">{t('landing.pricing.plus.title')}</h3>
               </div>
 
-              <div className="text-3xl sm:text-4xl font-extrabold font-mono text-white">
-                R$ 49,90 <span className="text-xs font-normal text-emerald-100">/mês</span>
+              {/* Price */}
+              <div className="text-3xl sm:text-4xl font-extrabold font-mono text-white flex items-baseline gap-1">
+                {t('landing.pricing.plus.price')} <span className="text-xs font-normal text-emerald-100">{t('landing.pricing.plus.period')}</span>
               </div>
 
-              <div className="text-xs font-extrabold text-emerald-950 bg-emerald-100 px-3 py-1.5 rounded-xl shadow-sm flex items-center gap-1.5">
+              {/* Highlight Pill */}
+              <div className="h-9 text-xs font-extrabold text-emerald-950 bg-emerald-100 px-3 rounded-xl shadow-xs flex items-center gap-1.5 shrink-0">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                <span>Scans 100% ILIMITADOS</span>
+                <span>{t('landing.pricing.plus.pill')}</span>
               </div>
 
-              <ul className="text-xs text-emerald-50 space-y-2.5 pt-2">
+              {/* Features list */}
+              <ul className="text-xs text-emerald-50 space-y-2.5 pt-1 flex-1">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-200 shrink-0 mt-0.5" />
-                  <span><strong>Scans ILIMITADOS</strong> de câmera e código de barras</span>
+                  <span>{t('landing.pricing.plus.item1')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-200 shrink-0 mt-0.5" />
-                  <span>IA Gemini 3.8 Flash prioritária (Tabela TACO oficial)</span>
+                  <span>{t('landing.pricing.plus.item2')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-200 shrink-0 mt-0.5" />
-                  <span>Substituições saudáveis personalizadas sem limites</span>
+                  <span>{t('landing.pricing.plus.item3')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-200 shrink-0 mt-0.5" />
-                  <span>Relatórios executivos mensais em PDF com gráficos Recharts</span>
+                  <span>{t('landing.pricing.plus.item4')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-200 shrink-0 mt-0.5" />
-                  <span>Suporte prioritário e novidades antecipadas</span>
+                  <span>{t('landing.pricing.plus.item5')}</span>
                 </li>
               </ul>
             </div>
@@ -664,106 +691,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <button
               onClick={() => handleSubscribe('plus')}
               disabled={subscribingPlan !== null}
-              className="mt-8 w-full py-3.5 bg-white text-emerald-900 hover:bg-emerald-50 font-extrabold text-xs rounded-2xl transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 active:scale-98"
+              className="mt-6 w-full py-3.5 bg-white text-emerald-900 hover:bg-emerald-50 font-extrabold text-xs rounded-2xl transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 active:scale-98 shrink-0"
             >
               {subscribingPlan === 'plus' ? (
                 <Loader2 className="w-4 h-4 animate-spin text-emerald-800" />
               ) : (
                 <Sparkles className="w-4 h-4 text-emerald-600" />
               )}
-              <span>{currentPlan === 'plus' ? 'Plano Atual (Ativo)' : 'Assinar Plus com Stripe (R$ 49,90)'}</span>
+              <span>{currentPlan === 'plus' ? t('landing.pricing.plus.btnActive') : t('landing.pricing.plus.btnSubscribe')}</span>
             </button>
           </div>
 
-        </div>
-
-        {/* Stripe Product Integration Drawer & Inspector */}
-        <div className="max-w-4xl mx-auto p-4 sm:p-5 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200/90 dark:border-slate-800/80 text-left space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center">
-                <Database className="w-4 h-4" />
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-slate-900 dark:text-white">
-                  Integração do Produto no Stripe: NutriLense AI
-                </h4>
-                <p className="text-[11px] text-slate-500">
-                  Estrutura oficial de produto e preços sincronizáveis via Stripe API
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowStripeSpecs(!showStripeSpecs)}
-                className="px-3 py-1.5 text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer flex items-center gap-1.5"
-              >
-                <Code2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>{showStripeSpecs ? 'Ocultar Parâmetros' : 'Ver IDs do Stripe'}</span>
-              </button>
-
-              <button
-                onClick={handleSyncStripeProduct}
-                disabled={isSyncingStripe}
-                className="px-3.5 py-1.5 text-[11px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50 shadow-sm"
-              >
-                {isSyncingStripe ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-                <span>Sincronizar no Stripe</span>
-              </button>
-            </div>
-          </div>
-
-          {stripeSyncResult && (
-            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 rounded-xl text-xs text-emerald-900 dark:text-emerald-100 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>{stripeSyncResult.message}</span>
-            </div>
-          )}
-
-          {showStripeSpecs && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs font-mono">
-              <div className="p-3 bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-1.5">
-                <div className="font-sans font-bold text-slate-800 dark:text-slate-200 text-[11px] flex items-center justify-between">
-                  <span>Produto Stripe</span>
-                  <span className="text-emerald-600">Ativo</span>
-                </div>
-                <div className="text-[11px] text-slate-500">Nome: <strong className="text-slate-900 dark:text-white">NutriLense AI</strong></div>
-                <div className="text-[11px] text-slate-500">Product ID: <strong className="text-slate-900 dark:text-white">prod_nutrilense_ai</strong></div>
-                <div className="text-[11px] text-slate-500">Moeda: <strong className="text-slate-900 dark:text-white">BRL (R$)</strong></div>
-              </div>
-
-              <div className="p-3 bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-1.5">
-                <div className="font-sans font-bold text-slate-800 dark:text-slate-200 text-[11px]">
-                  Preços & Cotas Recorrentes
-                </div>
-                <div className="text-[11px] text-slate-500">
-                  Pro: <strong className="text-slate-900 dark:text-white">price_nutrilense_pro_20scans</strong> (R$ 24,90/mês • 20 scans)
-                </div>
-                <div className="text-[11px] text-slate-500">
-                  Plus: <strong className="text-slate-900 dark:text-white">price_nutrilense_plus_unlimited</strong> (R$ 49,90/mês • Ilimitado)
-                </div>
-                <div className="text-[11px] text-slate-500">Intervalo: <strong className="text-slate-900 dark:text-white">Mensal</strong></div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Stripe Trust & Security Badges */}
-        <div className="pt-2 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-slate-500 dark:text-slate-400">
-          <span className="flex items-center gap-1.5">
-            <Lock className="w-3.5 h-3.5 text-emerald-600" />
-            Pagamentos Criptografados via Stripe
-          </span>
-          <span>·</span>
-          <span className="flex items-center gap-1.5">
-            <CreditCard className="w-3.5 h-3.5 text-emerald-600" />
-            Cartões de Crédito, Débito e Pix
-          </span>
-          <span>·</span>
-          <span>Cancele a qualquer momento em 1 clique</span>
-          <span>·</span>
-          <span>Ativação imediata de cota</span>
         </div>
 
       </section>
@@ -775,15 +713,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <div className="md:col-span-8 space-y-4">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-xs font-semibold uppercase tracking-wider border border-emerald-500/30">
                 <MapPin className="w-3.5 h-3.5" />
-                Integração com Google Maps
+                {t('landing.mapsBanner.badge')}
               </div>
               <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                Encontre o Nutricionista Mais Próximo da Sua Localização
+                {t('landing.mapsBanner.title')}
               </h3>
               <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl">
-                Aliamos a inteligência artificial do scanner à prescrição humana personalizada.
-                Descubra clínicas e consultórios credenciados com registro ativo no CRN, filtre por especialidade
-                (doenças crônicas, esportiva, funcional ou reeducação) e trace a rota no Google Maps com um clique.
+                {t('landing.mapsBanner.desc')}
               </p>
               <div className="pt-2 flex flex-wrap items-center gap-3">
                 <button
@@ -791,12 +727,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer"
                 >
                   <Navigation className="w-4 h-4" />
-                  Explorar Nutricionistas no Mapa
+                  {t('landing.mapsBanner.btn')}
                   <ArrowRight className="w-4 h-4 ml-1" />
                 </button>
                 <span className="text-xs text-slate-400 flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  GPS em tempo real + dados georreferenciados
+                  {t('landing.mapsBanner.gps')}
                 </span>
               </div>
             </div>
@@ -804,14 +740,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             <div className="md:col-span-4 bg-white/5 backdrop-blur-md p-5 rounded-2xl border border-white/10 space-y-3">
               <div className="flex items-center gap-2 text-emerald-400 text-xs font-mono font-semibold">
                 <Sparkles className="w-4 h-4" />
-                CONECTIVIDADE CLÍNICA
+                {t('landing.mapsBanner.sideBadge')}
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Compartilhe seu diário nutricional NutriLense e histórico da Tabela TACO diretamente com seu nutricionista antes da consulta.
+                {t('landing.mapsBanner.sideDesc')}
               </p>
               <div className="pt-2 border-t border-white/10 text-[11px] text-slate-400 font-mono flex items-center justify-between">
-                <span>Google Maps Platform</span>
-                <span className="text-emerald-400">Raio até 50km</span>
+                <span>{t('landing.mapsBanner.platform')}</span>
+                <span className="text-emerald-400">{t('landing.mapsBanner.radius')}</span>
               </div>
             </div>
           </div>
@@ -825,111 +761,83 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800 rounded-full text-emerald-700 dark:text-emerald-300 text-xs font-bold">
             <HelpCircle className="w-3.5 h-3.5" />
-            <span>Tire Suas Dúvidas</span>
+            <span>{t('landing.faq.badge')}</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Perguntas Frequentes</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+            {t('landing.faq.title')}
+          </h2>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
-            Tudo o que você precisa saber sobre o funcionamento do scanner, auditoria científica TACO, modo offline e planos de acesso.
+            {t('landing.faq.subtitle')}
           </p>
         </div>
 
         <div className="space-y-3.5">
-          {[
-            {
-              category: 'Restrições & Saúde',
-              icon: AlertTriangle,
-              q: 'Como o app analisa restrições?',
-              a: 'O NutriLense AI compara a lista completa de ingredientes e a composição centesimal do produto contra o seu perfil personalizado (lactose, glúten, sódio elevado para hipertensos, açúcares ocultos para diabéticos ou alergias alimentares). Utilizando a visão computacional do modelo Gemini, o sistema identifica derivados sutis, aditivos camuflados e contaminações cruzadas indicadas no rótulo, disparando alertas imediatos destacados em vermelho caso haja qualquer incompatibilidade com sua dieta.',
-            },
-            {
-              category: 'Base Científica & Precisão',
-              icon: BookOpen,
-              q: 'A base de dados é confiável?',
-              a: 'Sim, 100% fundamentada na ciência. Além da inteligência artificial de leitura de rótulos, o aplicativo utiliza a Tabela Brasileira de Composição de Alimentos — TACO (NEPA/UNICAMP 4ª Edição) como referência analítica secundária. Isso permite auditar a densidade calórica, distribuição de macronutrientes (proteínas, carboidratos e gorduras) e níveis de sódio real contra matrizes biológicas oficiais brasileiras, detectando divergências ou informações enganosas da indústria.',
-            },
-            {
-              category: 'Conectividade & PWA',
-              icon: WifiOff,
-              q: 'Posso usar o scanner offline?',
-              a: 'O histórico e a consulta de produtos escaneados funcionam perfeitamente sem internet graças à arquitetura Progressive Web App (PWA) com Service Worker avançado e cache local persistente. Caso você esteja em um supermercado com sinal fraco de 4G/5G, você pode consultar todos os alimentos previamente escaneados, revisar notas de saúde e macronutrientes. Para escanear um novo rótulo com visão multimodal Gemini e validação TACO em tempo real, uma conexão momentânea é utilizada para o processamento de imagem.',
-            },
-            {
-              category: 'Assinatura & Stripe',
-              icon: CreditCard,
-              q: 'Como cancelo minha assinatura?',
-              a: 'Você pode cancelar sua assinatura a qualquer momento com apenas 1 clique, sem burocracia ou taxas de rescisão. Toda a gestão de faturamento é processada diretamente pela infraestrutura segura do Stripe. Ao cancelar, você continua com acesso total aos benefícios do seu plano Pro ou Plus até o final do período mensal já contratado, retornando automaticamente ao plano gratuito sem nenhuma cobrança surpresa subsequente.',
-            },
-            {
-              category: 'Reconhecimento & Câmera',
-              icon: Camera,
-              q: 'O scanner funciona em qualquer produto de supermercado?',
-              a: 'Sim! O NutriLense AI lê tanto fotos da tabela nutricional e lista de ingredientes quanto códigos de barras EAN-13 comuns em produtos nacionais e internacionais. A IA classifica o grupo NOVA (nível de ultraprocessamento de 1 a 4), calcula a nota Nutri-Score (A a E) e rastreia aditivos nocivos em poucos segundos.',
-            },
-            {
-              category: 'Instalação Instantânea',
-              icon: Smartphone,
-              q: 'Preciso baixar pela Google Play ou Apple App Store para ter o app no celular?',
-              a: 'Não é necessário baixar das lojas de aplicativos! O NutriLense AI é um PWA homologado: você pode instalá-lo diretamente pelo navegador (no Safari do iPhone clicando em "Compartilhar" → "Adicionar à Tela de Início"; ou no Chrome/Android clicando no botão "Instalar App" no topo). Ele abre instantaneamente em tela cheia com comportamento de aplicativo nativo.',
-            },
-            {
-              category: 'Relatórios Executivos',
-              icon: FileBarChart,
-              q: 'Posso exportar relatórios nutricionais em PDF para levar ao médico ou nutricionista?',
-              a: 'Sim! Na aba "Relatórios PDF", você visualiza dashboards de evolução semanal de macronutrientes e calorias com gráficos Recharts e gera com um clique relatórios executivos para download ou impressão, ideais para acompanhamento esportivo ou consultas de rotina.',
-            },
-          ].map((item, idx) => {
-            const Icon = item.icon;
-            const isOpen = openFaqIndex === idx;
+          {(() => {
+            const faqIcons = [
+              AlertTriangle,
+              BookOpen,
+              WifiOff,
+              CreditCard,
+              Camera,
+              Smartphone,
+              FileBarChart,
+            ];
+            const faqItems = (t('landing.faq.items', { returnObjects: true }) as Array<{ category: string; q: string; a: string }>) || [];
 
-            return (
-              <div
-                key={idx}
-                className={`bg-white dark:bg-slate-900 rounded-2xl border transition-all duration-200 overflow-hidden ${
-                  isOpen
-                    ? 'border-emerald-500/80 shadow-md ring-1 ring-emerald-500/20'
-                    : 'border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-                }`}
-              >
-                <button
-                  onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                  className="w-full p-4 sm:p-5 text-left flex items-start sm:items-center justify-between gap-4 cursor-pointer focus:outline-none"
-                  aria-expanded={isOpen}
+            return faqItems.map((item, idx) => {
+              const Icon = faqIcons[idx % faqIcons.length];
+              const isOpen = openFaqIndex === idx;
+
+              return (
+                <div
+                  key={idx}
+                  className={`bg-white dark:bg-slate-900 rounded-2xl border transition-all duration-200 overflow-hidden ${
+                    isOpen
+                      ? 'border-emerald-500/80 shadow-md ring-1 ring-emerald-500/20'
+                      : 'border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                  }`}
                 >
-                  <div className="flex items-start sm:items-center gap-3">
-                    <div className={`p-2 rounded-xl shrink-0 transition-colors ${
-                      isOpen
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                  <button
+                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                    className="w-full p-4 sm:p-5 text-left flex items-start sm:items-center justify-between gap-4 cursor-pointer focus:outline-none"
+                    aria-expanded={isOpen}
+                  >
+                    <div className="flex items-start sm:items-center gap-3">
+                      <div className={`p-2 rounded-xl shrink-0 transition-colors ${
+                        isOpen
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                      }`}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block mb-0.5">
+                          {item.category}
+                        </span>
+                        <h4 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm leading-snug">
+                          {item.q}
+                        </h4>
+                      </div>
+                    </div>
+
+                    <div className={`p-1.5 rounded-lg text-slate-400 shrink-0 transition-transform duration-200 ${
+                      isOpen ? 'rotate-180 text-emerald-600 dark:text-emerald-400' : ''
                     }`}>
-                      <Icon className="w-4 h-4" />
+                      <ChevronDown className="w-4 h-4" />
                     </div>
-                    <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block mb-0.5">
-                        {item.category}
-                      </span>
-                      <h4 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm leading-snug">
-                        {item.q}
-                      </h4>
+                  </button>
+
+                  {isOpen && (
+                    <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0 border-t border-slate-100 dark:border-slate-800/80">
+                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed pt-3">
+                        {item.a}
+                      </p>
                     </div>
-                  </div>
-
-                  <div className={`p-1.5 rounded-lg text-slate-400 shrink-0 transition-transform duration-200 ${
-                    isOpen ? 'rotate-180 text-emerald-600 dark:text-emerald-400' : ''
-                  }`}>
-                    <ChevronDown className="w-4 h-4" />
-                  </div>
-                </button>
-
-                {isOpen && (
-                  <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0 border-t border-slate-100 dark:border-slate-800/80">
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed pt-3">
-                      {item.a}
-                    </p>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                  )}
+                </div>
+              );
+            });
+          })()}
         </div>
       </section>
 
@@ -947,21 +855,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
                 </span>
               </div>
               <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400 max-w-sm">
-                Plataforma de inteligência nutricional multimodal combinando visão computacional Gemini, padrão científico TACO (UNICAMP) e navegação offline PWA.
+                {t('landing.footer.desc')}
               </p>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-full text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold">
                 <Sparkles className="w-3 h-3 text-emerald-500" />
-                <span>Desenvolvido com Engenharia de Alta Performance</span>
+                <span>{t('landing.footer.highPerf')}</span>
               </div>
             </div>
 
             {/* Quick Links & Developer Portfolio */}
             <div className="space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                Desenvolvedor & Portfólio
+                {t('landing.footer.portfolioTitle')}
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Conheça outros projetos, soluções de software e arquiteturas completas desenvolvidas pela criadora do NutriLense AI:
+                {t('landing.footer.portfolioDesc')}
               </p>
               <div>
                 <a
@@ -971,7 +879,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
                   className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-emerald-600 dark:hover:bg-emerald-500 rounded-xl text-xs font-bold transition-all shadow-sm group"
                 >
                   <Globe className="w-4 h-4 text-emerald-400 dark:text-white" />
-                  <span>Acessar Portfólio Aline DEV</span>
+                  <span>{t('landing.footer.portfolioBtn')}</span>
                   <ExternalLink className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
                 </a>
               </div>
@@ -983,10 +891,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             {/* Forms of Contact & Support */}
             <div className="space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                Fale Conosco & Suporte
+                {t('landing.footer.contactTitle')}
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Dúvidas comerciais, parcerias, suporte técnico ou feedback sobre o NutriLense AI:
+                {t('landing.footer.contactDesc')}
               </p>
               <div className="space-y-2">
                 <a
@@ -997,7 +905,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
                     <Mail className="w-4 h-4" />
                   </div>
                   <div className="truncate">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold block">E-mail de Contato</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-bold block">{t('landing.footer.contactEmail')}</span>
                     <span className="font-mono text-emerald-700 dark:text-emerald-400 font-semibold truncate block">
                       falecomnutrion@gmail.con
                     </span>
@@ -1011,10 +919,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
           {/* Bottom Copyright & Disclaimer */}
           <div className="pt-8 border-t border-slate-200/60 dark:border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-xs text-slate-500">
             <p>
-              © {new Date().getFullYear()} {config.appName}. Todos os direitos reservados.
+              © {new Date().getFullYear()} {config.appName}. {t('landing.footer.copyright')}
             </p>
             <p className="text-[11px]">
-              Portfólio Oficial:{' '}
+              {t('landing.footer.official')}{' '}
               <a
                 href="https://alinedev.ai.studio"
                 target="_blank"

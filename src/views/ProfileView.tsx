@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useWhiteLabel } from '../context/WhiteLabelContext';
 import {
   User as UserIcon,
@@ -31,7 +32,8 @@ const RESTRICTIONS_LIST: { id: DietaryRestriction; label: string; desc: string }
 ];
 
 export const ProfileView: React.FC = () => {
-  const { profile, history, updateProfile, currentUser, signInWithGoogle, signOut } = useWhiteLabel();
+  const { t } = useTranslation();
+  const { profile, history, updateProfile, currentUser, signInWithGoogle, signOut, setPlan, currentPlan, deleteAccount, isUS } = useWhiteLabel();
 
   const [name, setName] = useState(profile.name);
   const [email, setEmail] = useState(profile.email);
@@ -75,9 +77,9 @@ export const ProfileView: React.FC = () => {
       <div className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-            Configurações Pessoais
+            {t('profile.settings')}
           </span>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Perfil, Metas e Medalhas</h2>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t('profile.title')}</h2>
         </div>
 
         <button
@@ -85,99 +87,11 @@ export const ProfileView: React.FC = () => {
           className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
         >
           <Save className="w-4 h-4" />
-          <span>{isSaved ? 'Salvo!' : 'Salvar Alterações'}</span>
+          <span>{isSaved ? t('profile.saved') : t('profile.save')}</span>
         </button>
       </div>
 
-      {/* Firebase Cloud Firestore & Google Auth Card */}
-      <div className="p-6 bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 text-white rounded-3xl border border-emerald-900/40 shadow-lg space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0">
-              <Cloud className="w-5 h-5 text-emerald-400" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
-                  Firebase Cloud Firestore & Google Auth
-                </span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono border border-emerald-500/30">
-                  Enterprise
-                </span>
-              </div>
-              <h3 className="text-lg font-bold text-white mt-0.5">
-                {currentUser ? 'Sincronização em Nuvem Ativa' : 'Conecte sua Conta para Sincronização em Nuvem'}
-              </h3>
-              <p className="text-xs text-slate-300 mt-1 max-w-xl">
-                {currentUser
-                  ? `Seus escaneamentos de rótulos, restrições alimentares e metas nutricionais estão sendo persistidos de forma segura no Cloud Firestore do Firebase.`
-                  : `Seus dados estão armazenados localmente neste navegador. Faça login com o Google para salvar histórico, restrições e conquistas na nuvem de modo persistente.`}
-              </p>
-            </div>
-          </div>
 
-          <div className="shrink-0">
-            {currentUser ? (
-              <div className="flex flex-col sm:items-end gap-2">
-                <div className="flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700">
-                  {currentUser.photoURL ? (
-                    <img
-                      src={currentUser.photoURL}
-                      alt={currentUser.displayName || 'Google'}
-                      className="w-5 h-5 rounded-full"
-                    />
-                  ) : (
-                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  )}
-                  <span className="text-xs font-medium text-slate-200">
-                    {currentUser.displayName || currentUser.email}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => signOut()}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 text-xs text-rose-300 hover:text-rose-200 hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span>Desconectar Conta Google</span>
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => signInWithGoogle()}
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-slate-900 hover:bg-slate-100 rounded-xl font-bold text-xs shadow-md transition-all cursor-pointer hover:scale-[1.02]"
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                  />
-                </svg>
-                <span>Conectar com Google</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="pt-2 border-t border-slate-800 text-[11px] text-slate-400 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono">
-          <span>Banco: ai-studio-saasnutrilenseai-efd4e35f-21da-40cb-8599-0ada1ea97d08</span>
-          <span>Projeto: studio-9411389430-61164</span>
-          <span className="text-emerald-400">Regras de Segurança ABAC Ativas</span>
-        </div>
-      </div>
 
       {/* Gamification: Achievements and Badges */}
       <div className="p-6 bg-gradient-to-br from-white via-white to-emerald-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/20 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-5">
@@ -410,7 +324,7 @@ export const ProfileView: React.FC = () => {
             className="w-full p-4 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-800 text-left hover:border-rose-400 transition-all"
           >
             <span className="font-bold text-slate-900 dark:text-white">Trocar Plano</span>
-            <p className="text-xs text-slate-500">Upgrade para Pro ou Plus</p>
+            <p className="text-xs text-slate-500">{isUS ? 'Pro: $9.99/mo | Plus: $19.99/mo' : 'Upgrade para Pro ou Plus'}</p>
           </button>
           
           <button

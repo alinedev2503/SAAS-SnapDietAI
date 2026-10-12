@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Camera, X, Upload, Barcode, Sparkles, AlertCircle, RefreshCw, CheckCircle2, BookOpen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useWhiteLabel } from '../context/WhiteLabelContext';
-import { ProductScan } from '../types/nutrition';
+import { ProductScan, ScanCategory } from '../types/nutrition';
 
 interface CameraScannerProps {
   isOpen: boolean;
@@ -9,12 +10,8 @@ interface CameraScannerProps {
   onScanComplete: (scan: ProductScan) => void;
 }
 
-const SAMPLE_PRESETS = [
-  { label: '🥛 Iogurte Proteico (Saudável - A)', barcode: '7891000100103' },
-  { label: '🥤 Refrigerante Cola (Nocivo - E)', barcode: '7891000200204' },
-];
-
 export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, onScanComplete }) => {
+  const { t } = useTranslation();
   const { profile, addScan } = useWhiteLabel();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -25,6 +22,11 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
   const [barcodeInput, setBarcodeInput] = useState<string>('');
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [scanCategory, setScanCategory] = useState<ScanCategory>('industrializado');
+
+  const samplePresets = [
+    { label: t('modals.scanner.presetYogurt', '🥛 Iogurte Proteico (Saudável - A)'), barcode: '7891000100103' },
+    { label: t('modals.scanner.presetSoda', '🥤 Refrigerante Cola (Nocivo - E)'), barcode: '7891000200204' },
+  ];
 
   useEffect(() => {
     if (isOpen) {
@@ -49,7 +51,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
       }
     } catch (err: any) {
       console.warn('Camera access error:', err);
-      setCameraError('Câmera indisponível no navegador ou permissão negada. Você pode enviar uma foto do rótulo ou testar pelos códigos numéricos abaixo.');
+      setCameraError(t('modals.scanner.cameraError', 'Câmera indisponível no navegador ou permissão negada. Você pode enviar uma foto do rótulo ou testar pelos códigos numéricos abaixo.'));
     }
   };
 
@@ -97,11 +99,11 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
           onClose();
         }
       } else {
-        alert('Não foi possível ler o rótulo/prato. Tente novamente com mais clareza.');
+        alert(t('modals.scanner.readError', 'Não foi possível ler o rótulo/prato. Tente novamente com mais clareza.'));
       }
     } catch (err) {
       console.error('Scan error:', err);
-      alert('Ocorreu um erro ao processar a leitura por IA.');
+      alert(t('modals.scanner.generalError', 'Ocorreu um erro ao processar a leitura por IA.'));
     } finally {
       setIsAnalyzing(false);
     }
@@ -133,8 +135,8 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
               <Camera className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Scanner de Alimentos</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Rótulo ou Foto de Prato</p>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('modals.scanner.title')}</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t('modals.scanner.subtitle')}</p>
             </div>
           </div>
           <button
@@ -157,7 +159,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
                   : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
-              {cat === 'industrializado' ? 'Industrializado' : 'Prato Pronto'}
+              {cat === 'industrializado' ? t('modals.scanner.packaged') : t('modals.scanner.meal')}
             </button>
           ))}
         </div>
@@ -171,7 +173,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
           ) : (
             <div className="p-6 text-center text-slate-400">
               <AlertCircle className="w-10 h-10 mx-auto mb-2 text-amber-500 opacity-80" />
-              <p className="text-xs">{cameraError || 'Iniciando câmera...'}</p>
+              <p className="text-xs">{cameraError || t('modals.scanner.cameraStarting')}</p>
             </div>
           )}
 
@@ -194,10 +196,10 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
           {isAnalyzing && (
             <div className="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white p-6 z-20">
               <Sparkles className="w-12 h-12 text-emerald-400 animate-spin mb-3" />
-              <p className="text-sm font-bold tracking-wide">Auditando com Gemini IA...</p>
+              <p className="text-sm font-bold tracking-wide">{t('modals.scanner.aiAnalyzing')}</p>
               <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-950/80 border border-emerald-500/60 rounded-full text-emerald-300 text-[11px] font-bold">
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>Validação TACO (UNICAMP) Ativa</span>
+                <span>{t('modals.scanner.tacoValidation')}</span>
               </div>
             </div>
           )}
@@ -215,10 +217,14 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
               className="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Analisar {scanCategory === 'industrializado' ? 'Rótulo' : 'Prato'} Agora</span>
+              <span>
+                {t('modals.scanner.analyzeNow', {
+                  category: scanCategory === 'industrializado' ? t('modals.scanner.label') : t('modals.scanner.dish'),
+                })}
+              </span>
             </button>
 
-            <label className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 cursor-pointer flex items-center justify-center" title="Enviar foto da galeria">
+            <label className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 cursor-pointer flex items-center justify-center" title={t('modals.scanner.uploadTooltip')}>
               <Upload className="w-5 h-5" />
               <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
             </label>
@@ -228,12 +234,12 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
           <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
             <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
               <Barcode className="w-3.5 h-3.5" />
-              Ou Digite o Código de Barras EAN
+              {t('modals.scanner.orBarcode')}
             </label>
             <div className="flex items-center gap-2">
               <input
                 type="text"
-                placeholder="Ex: 7891000100103"
+                placeholder={t('modals.scanner.barcodePlaceholder')}
                 value={barcodeInput}
                 onChange={(e) => setBarcodeInput(e.target.value)}
                 className="flex-1 px-3 py-2 text-xs font-mono border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -243,14 +249,14 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
                 disabled={!barcodeInput || isAnalyzing}
                 className="px-3 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-xs font-bold rounded-lg hover:opacity-90 disabled:opacity-40 cursor-pointer"
               >
-                Buscar
+                {t('modals.scanner.search')}
               </button>
             </div>
 
             {/* Quick Demo Presets */}
             <div className="flex items-center gap-1.5 pt-1 overflow-x-auto pb-1">
-              <span className="text-[10px] text-slate-400 shrink-0">Exemplos:</span>
-              {SAMPLE_PRESETS.map((preset) => (
+              <span className="text-[10px] text-slate-400 shrink-0">{t('modals.scanner.examples')}</span>
+              {samplePresets.map((preset) => (
                 <button
                   key={preset.barcode}
                   onClick={() => {
