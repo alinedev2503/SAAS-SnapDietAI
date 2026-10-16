@@ -19,16 +19,16 @@ import {
 import { DietaryRestriction } from '../types/nutrition';
 import { calculateUserAchievements } from '../data/achievements';
 
-const RESTRICTIONS_LIST: { id: DietaryRestriction; label: string; desc: string }[] = [
-  { id: 'lactose', label: 'Intolerância a Lactose', desc: 'Alerta para leite, soro, manteiga e derivados lácteos' },
-  { id: 'gluten', label: 'Doença Celíaca / Sem Glúten', desc: 'Alerta para trigo, centeio, cevada e maltes' },
-  { id: 'peanuts', label: 'Alergia a Amendoim & Oleaginosas', desc: 'Alerta rigoroso para traços de castanhas e amendoim' },
-  { id: 'sodium', label: 'Restrição de Sódio (Hipertensão)', desc: 'Alerta para alimentos acima de 300mg de sódio' },
-  { id: 'diabetes', label: 'Controle de Glicemia / Diabetes', desc: 'Alerta para xarope de milho, sacarose e açúcares livres' },
-  { id: 'vegan', label: 'Dieta Vegana', desc: 'Alerta para ingredientes de origem animal e mel' },
-  { id: 'vegetarian', label: 'Dieta Vegetariana', desc: 'Alerta para carnes, peixes e gelatinas animais' },
-  { id: 'soy', label: 'Alergia a Soja', desc: 'Alerta para lecitina e proteínas concentradas de soja' },
-  { id: 'keto', label: 'Dieta Cetogênica (Keto)', desc: 'Alerta para itens ricos em carboidratos líquidos' },
+const RESTRICTIONS_LIST: { id: DietaryRestriction; fallbackLabel: string; fallbackDesc: string }[] = [
+  { id: 'lactose', fallbackLabel: 'Intolerância a Lactose', fallbackDesc: 'Alerta para leite, soro, manteiga e derivados lácteos' },
+  { id: 'gluten', fallbackLabel: 'Doença Celíaca / Sem Glúten', fallbackDesc: 'Alerta para trigo, centeio, cevada e maltes' },
+  { id: 'peanuts', fallbackLabel: 'Alergia a Amendoim & Oleaginosas', fallbackDesc: 'Alerta rigoroso para traços de castanhas e amendoim' },
+  { id: 'sodium', fallbackLabel: 'Restrição de Sódio (Hipertensão)', fallbackDesc: 'Alerta para alimentos acima de 300mg de sódio' },
+  { id: 'diabetes', fallbackLabel: 'Controle de Glicemia / Diabetes', fallbackDesc: 'Alerta para xarope de milho, sacarose e açúcares livres' },
+  { id: 'vegan', fallbackLabel: 'Dieta Vegana', fallbackDesc: 'Alerta para ingredientes de origem animal e mel' },
+  { id: 'vegetarian', fallbackLabel: 'Dieta Vegetariana', fallbackDesc: 'Alerta para carnes, peixes e gelatinas animais' },
+  { id: 'soy', fallbackLabel: 'Alergia a Soja', fallbackDesc: 'Alerta para lecitina e proteínas concentradas de soja' },
+  { id: 'keto', fallbackLabel: 'Dieta Cetogênica (Keto)', fallbackDesc: 'Alerta para itens ricos em carboidratos líquidos' },
 ];
 
 export const ProfileView: React.FC = () => {
@@ -91,7 +91,43 @@ export const ProfileView: React.FC = () => {
         </button>
       </div>
 
+      {/* Cloud Sync Status Banner */}
+      <div className="p-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3">
+          <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${currentUser ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
+            <Cloud className="w-5 h-5" />
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+              {currentUser ? t('profile.cloudSync') : t('profile.connectCloud')}
+              {currentUser && <ShieldCheck className="w-4 h-4 text-emerald-600" />}
+            </h4>
+            <p className="text-xs text-slate-500 mt-0.5">
+              {currentUser ? t('profile.cloudDesc') : t('profile.connectDesc')}
+            </p>
+          </div>
+        </div>
 
+        {currentUser ? (
+          <button
+            type="button"
+            onClick={signOut}
+            className="inline-flex items-center gap-1.5 px-4 py-2 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold transition-colors cursor-pointer shrink-0"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>{t('profile.disconnect')}</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={signInWithGoogle}
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer shrink-0"
+          >
+            <Cloud className="w-3.5 h-3.5" />
+            <span>{t('profile.connect')}</span>
+          </button>
+        )}
+      </div>
 
       {/* Gamification: Achievements and Badges */}
       <div className="p-6 bg-gradient-to-br from-white via-white to-emerald-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/20 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-5">
@@ -99,17 +135,17 @@ export const ProfileView: React.FC = () => {
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
               <Trophy className="w-4 h-4 text-amber-500" />
-              Sistema de Conquistas & Gamificação
+              {t('profile.achievements.badge')}
             </span>
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">
-              Medalhas de Hábitos & Metas Atingidas
+              {t('profile.achievements.subtitle')}
             </h3>
           </div>
 
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 rounded-full self-start sm:self-auto">
             <Award className="w-4 h-4 text-amber-600 dark:text-amber-400" />
             <span className="text-xs font-bold text-amber-900 dark:text-amber-300">
-              {unlockedCount} de {achievements.length} Desbloqueadas
+              {t('profile.achievements.unlockedCount', { unlocked: unlockedCount, total: achievements.length })}
             </span>
           </div>
         </div>
@@ -141,12 +177,12 @@ export const ProfileView: React.FC = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                       <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
-                        {item.title}
+                        {t(`profile.achievements.${item.id}_title`, item.title)}
                       </h4>
                       {isUnlocked ? (
                         <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded-full shrink-0">
                           <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                          Conquistada
+                          {t('profile.achievements.conquered')}
                         </span>
                       ) : (
                         <span className="text-[10px] font-medium text-slate-400 shrink-0">
@@ -156,7 +192,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-snug">
-                      {item.description}
+                      {t(`profile.achievements.${item.id}_desc`, item.description)}
                     </p>
                   </div>
                 </div>
@@ -164,9 +200,11 @@ export const ProfileView: React.FC = () => {
                 {/* Progress bar and milestone */}
                 <div className="mt-3.5 pt-3 border-t border-slate-100 dark:border-slate-800 space-y-1.5">
                   <div className="flex items-center justify-between text-[11px] font-medium text-slate-500">
-                    <span>Meta: {item.criteria}</span>
+                    <span>
+                      {t('profile.achievements.goal')} {t(`profile.achievements.${item.id}_crit`, item.criteria)}
+                    </span>
                     <span className="font-mono font-bold text-slate-700 dark:text-slate-300">
-                      {item.currentValue} / {item.targetValue} {item.unit}
+                      {item.currentValue} / {item.targetValue} {t(`profile.achievements.${item.id}_unit`, item.unit)}
                     </span>
                   </div>
 
@@ -191,12 +229,12 @@ export const ProfileView: React.FC = () => {
       <div className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
         <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
           <UserIcon className="w-4 h-4 text-emerald-600" />
-          Dados do Usuário
+          {t('profile.data.title')}
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
           <div className="space-y-1">
-            <label className="font-semibold text-slate-700 dark:text-slate-300">Nome Completo</label>
+            <label className="font-semibold text-slate-700 dark:text-slate-300">{t('profile.data.name')}</label>
             <input
               type="text"
               value={name}
@@ -206,7 +244,7 @@ export const ProfileView: React.FC = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="font-semibold text-slate-700 dark:text-slate-300">E-mail de Cadastro</label>
+            <label className="font-semibold text-slate-700 dark:text-slate-300">{t('profile.data.email')}</label>
             <input
               type="email"
               value={email}
@@ -222,10 +260,10 @@ export const ProfileView: React.FC = () => {
         <div>
           <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
             <ShieldAlert className="w-4 h-4 text-rose-600" />
-            Restrições Alimentares e Condições de Saúde
+            {t('profile.dietary.title')}
           </h3>
           <p className="text-xs text-slate-500 mt-1">
-            Selecione suas restrições. O scanner de IA acusará perigo imediatamente ao detectar ingredientes incompatíveis.
+            {t('profile.dietary.desc')}
           </p>
         </div>
 
@@ -252,9 +290,11 @@ export const ProfileView: React.FC = () => {
 
                 <div className="space-y-0.5">
                   <span className={`text-xs font-bold block ${isSelected ? 'text-rose-900 dark:text-rose-300' : 'text-slate-800 dark:text-slate-200'}`}>
-                    {item.label}
+                    {t(`profile.restrictionsList.${item.id}.label`, item.fallbackLabel)}
                   </span>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug block">{item.desc}</span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug block">
+                    {t(`profile.restrictionsList.${item.id}.desc`, item.fallbackDesc)}
+                  </span>
                 </div>
               </div>
             );
@@ -266,12 +306,12 @@ export const ProfileView: React.FC = () => {
       <div className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
         <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
           <HeartPulse className="w-4 h-4 text-emerald-600" />
-          Metas Diárias de Macronutrientes
+          {t('profile.nutriGoals.title')}
         </h3>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
           <div className="space-y-1">
-            <label className="font-semibold text-slate-700 dark:text-slate-300">Calorias (kcal)</label>
+            <label className="font-semibold text-slate-700 dark:text-slate-300">{t('profile.nutriGoals.calories')}</label>
             <input
               type="number"
               value={targetCalories}
@@ -281,7 +321,7 @@ export const ProfileView: React.FC = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="font-semibold text-slate-700 dark:text-slate-300">Proteínas (g)</label>
+            <label className="font-semibold text-slate-700 dark:text-slate-300">{t('profile.nutriGoals.protein')}</label>
             <input
               type="number"
               value={targetProtein}
@@ -291,7 +331,7 @@ export const ProfileView: React.FC = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="font-semibold text-slate-700 dark:text-slate-300">Carboidratos (g)</label>
+            <label className="font-semibold text-slate-700 dark:text-slate-300">{t('profile.nutriGoals.carbs')}</label>
             <input
               type="number"
               value={targetCarbs}
@@ -301,7 +341,7 @@ export const ProfileView: React.FC = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="font-semibold text-slate-700 dark:text-slate-300">Gorduras (g)</label>
+            <label className="font-semibold text-slate-700 dark:text-slate-300">{t('profile.nutriGoals.fat')}</label>
             <input
               type="number"
               value={targetFat}
@@ -311,52 +351,53 @@ export const ProfileView: React.FC = () => {
           </div>
         </div>
       </div>
-      {/* Plano e Conta */}
+
+      {/* Account & Plan */}
       <div className="p-6 bg-rose-50 dark:bg-rose-950/20 rounded-3xl border border-rose-200 dark:border-rose-900 shadow-sm space-y-4 mt-8">
         <h3 className="text-sm font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
-          Configurações de Conta e Plano
+          {t('profile.planAccount.title')}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
             type="button"
             onClick={() => setPlan(currentPlan === 'free' ? 'pro' : 'plus')}
-            className="w-full p-4 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-800 text-left hover:border-rose-400 transition-all"
+            className="w-full p-4 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-800 text-left hover:border-rose-400 transition-all cursor-pointer"
           >
-            <span className="font-bold text-slate-900 dark:text-white">Trocar Plano</span>
-            <p className="text-xs text-slate-500">{isUS ? 'Pro: $9.99/mo | Plus: $19.99/mo' : 'Upgrade para Pro ou Plus'}</p>
+            <span className="font-bold text-slate-900 dark:text-white">{t('profile.planAccount.changePlan')}</span>
+            <p className="text-xs text-slate-500">{isUS ? 'Pro: $9.99/mo | Plus: $19.99/mo' : t('profile.planAccount.upgradeDesc')}</p>
           </button>
           
           <button
             type="button"
             onClick={() => handleSave(new Event('submit') as any)}
-            className="w-full p-4 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-800 text-left hover:border-rose-400 transition-all"
+            className="w-full p-4 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-800 text-left hover:border-rose-400 transition-all cursor-pointer"
           >
-            <span className="font-bold text-slate-900 dark:text-white">Editar Dados</span>
-            <p className="text-xs text-slate-500">Salvar alterações no perfil</p>
+            <span className="font-bold text-slate-900 dark:text-white">{t('profile.planAccount.editData')}</span>
+            <p className="text-xs text-slate-500">{t('profile.planAccount.editDesc')}</p>
           </button>
 
           <button
             type="button"
             onClick={() => setPlan('free')}
-            className="w-full p-4 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-800 text-left hover:border-rose-400 transition-all"
+            className="w-full p-4 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-800 text-left hover:border-rose-400 transition-all cursor-pointer"
           >
-            <span className="font-bold text-rose-600 dark:text-rose-400">Cancelar Plano</span>
-            <p className="text-xs text-slate-500">Retornar ao plano gratuito</p>
+            <span className="font-bold text-rose-600 dark:text-rose-400">{t('profile.planAccount.cancelPlan')}</span>
+            <p className="text-xs text-slate-500">{t('profile.planAccount.cancelDesc')}</p>
           </button>
           
           <button
             type="button"
             onClick={async () => {
-              if (confirm('Tem certeza? Isso apagará todos os seus dados e removerá sua conta do app.')) {
+              if (confirm(t('profile.planAccount.confirmDelete'))) {
                 await deleteAccount();
-                alert('Conta excluída com sucesso.');
+                alert(t('profile.planAccount.deleteSuccess'));
               }
             }}
-            className="w-full p-4 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-800 text-left hover:border-rose-400 transition-all"
+            className="w-full p-4 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-800 text-left hover:border-rose-400 transition-all cursor-pointer"
           >
-            <span className="font-bold text-rose-600 dark:text-rose-400">Excluir Cadastro</span>
-            <p className="text-xs text-slate-500">Apagar todos os dados e conta</p>
+            <span className="font-bold text-rose-600 dark:text-rose-400">{t('profile.planAccount.deleteAccount')}</span>
+            <p className="text-xs text-slate-500">{t('profile.planAccount.deleteDesc')}</p>
           </button>
         </div>
       </div>

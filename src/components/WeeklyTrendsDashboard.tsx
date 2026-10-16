@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -22,18 +23,20 @@ interface WeeklyTrendsDashboardProps {
 }
 
 export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ history, profile }) => {
+  const { t, i18n } = useTranslation();
   const [activeMetric, setActiveDemo] = useState<'macros' | 'healthScore' | 'calories'>('macros');
 
   // Generate last 7 days data aggregated from history
   const generate7DaysData = () => {
     const days: { [key: string]: { day: string; date: string; calories: number; protein: number; carbs: number; fat: number; sodium: number; healthScores: number[] } } = {};
+    const localeCode = i18n.language?.startsWith('en') ? 'en-US' : (i18n.language?.startsWith('es') ? 'es-ES' : 'pt-BR');
     
     // Create baseline for last 7 days
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
       const isoDate = d.toISOString().split('T')[0];
-      const dayLabel = d.toLocaleDateString('pt-BR', { weekday: 'short' });
+      const dayLabel = d.toLocaleDateString(localeCode, { weekday: 'short' });
       days[isoDate] = {
         day: dayLabel.charAt(0).toUpperCase() + dayLabel.slice(1),
         date: isoDate,
@@ -99,13 +102,13 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
             <Activity className="w-4 h-4" />
-            Evolução e Tendências Semanais (Recharts)
+            {t('reports.dashboardBadge')}
           </span>
           <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-            Ingestão Semanal de Macronutrientes & Calorias
+            {t('reports.dashboardTitle')}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Mapeamento dinâmico baseado nos produtos escaneados e alimentos auditados via TACO.
+            {t('reports.dashboardSubtitle')}
           </p>
         </div>
 
@@ -119,7 +122,7 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
             }`}
           >
-            Macronutrientes (g)
+            {t('reports.tabMacros')}
           </button>
 
           <button
@@ -130,7 +133,7 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
             }`}
           >
-            Índice de Saúde (0-100)
+            {t('reports.tabHealthScore')}
           </button>
 
           <button
@@ -141,7 +144,7 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
             }`}
           >
-            Calorias vs. Meta
+            {t('reports.tabCalories')}
           </button>
         </div>
       </div>
@@ -149,32 +152,32 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
       {/* Macronutrients Weekly Summary Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 bg-slate-50 dark:bg-slate-950/60 rounded-2xl border border-slate-200/60 dark:border-slate-800/80">
         <div className="text-center p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
-          <span className="text-[10px] uppercase font-bold text-slate-400 block">Carboidratos</span>
+          <span className="text-[10px] uppercase font-bold text-slate-400 block">{t('reports.carbs')}</span>
           <span className="text-base font-extrabold text-sky-600 dark:text-sky-400 font-mono">
             {weeklyTotals.carbs}g
           </span>
-          <span className="text-[10px] text-slate-500 block">semana</span>
+          <span className="text-[10px] text-slate-500 block">{t('reports.week')}</span>
         </div>
         <div className="text-center p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
-          <span className="text-[10px] uppercase font-bold text-slate-400 block">Proteínas</span>
+          <span className="text-[10px] uppercase font-bold text-slate-400 block">{t('reports.protein')}</span>
           <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
             {weeklyTotals.protein}g
           </span>
-          <span className="text-[10px] text-slate-500 block">semana</span>
+          <span className="text-[10px] text-slate-500 block">{t('reports.week')}</span>
         </div>
         <div className="text-center p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
-          <span className="text-[10px] uppercase font-bold text-slate-400 block">Gorduras Totais</span>
+          <span className="text-[10px] uppercase font-bold text-slate-400 block">{t('reports.fat')}</span>
           <span className="text-base font-extrabold text-amber-600 dark:text-amber-400 font-mono">
             {weeklyTotals.fat}g
           </span>
-          <span className="text-[10px] text-slate-500 block">semana</span>
+          <span className="text-[10px] text-slate-500 block">{t('reports.week')}</span>
         </div>
         <div className="text-center p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
-          <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Calórico</span>
+          <span className="text-[10px] uppercase font-bold text-slate-400 block">{t('reports.calories')}</span>
           <span className="text-base font-extrabold text-slate-900 dark:text-white font-mono">
             {weeklyTotals.calories}
           </span>
-          <span className="text-[10px] text-slate-500 block">kcal semana</span>
+          <span className="text-[10px] text-slate-500 block">{t('reports.kcalWeek')}</span>
         </div>
       </div>
 
@@ -191,9 +194,9 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
                 itemStyle={{ color: '#fff' }}
               />
               <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-              <Bar dataKey="protein" name="Proteínas (g)" fill="#059669" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="carbs" name="Carboidratos (g)" fill="#0284c7" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="fat" name="Gorduras (g)" fill="#d97706" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="protein" name={t('reports.chartProtein')} fill="#059669" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="carbs" name={t('reports.chartCarbs')} fill="#0284c7" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="fat" name={t('reports.chartFat')} fill="#d97706" radius={[4, 4, 0, 0]} />
             </BarChart>
           ) : activeMetric === 'healthScore' ? (
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -209,7 +212,7 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
               <Tooltip
                 contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
               />
-              <Area type="monotone" dataKey="healthScore" name="Índice Nutri (0-100)" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#healthGrad)" />
+              <Area type="monotone" dataKey="healthScore" name={t('reports.chartHealthScore')} stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#healthGrad)" />
             </AreaChart>
           ) : (
             <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -220,8 +223,8 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
                 contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
               />
               <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-              <Line type="monotone" dataKey="calories" name="Consumo Real (kcal)" stroke="#059669" strokeWidth={3} dot={{ r: 4 }} />
-              <Line type="monotone" dataKey="targetCalories" name="Meta Diária (kcal)" stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 5" dot={false} />
+              <Line type="monotone" dataKey="calories" name={t('reports.chartRealCal')} stroke="#059669" strokeWidth={3} dot={{ r: 4 }} />
+              <Line type="monotone" dataKey="targetCalories" name={t('reports.chartTargetCal')} stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 5" dot={false} />
             </LineChart>
           )}
         </ResponsiveContainer>
@@ -234,8 +237,8 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
             <TrendingUp className="w-4 h-4" />
           </div>
           <div>
-            <span className="font-bold text-emerald-900 dark:text-emerald-300 block">Tendência Positiva</span>
-            <span className="text-emerald-700/80 dark:text-emerald-400/80 text-[11px]">+14% de ingestão protéica semanal</span>
+            <span className="font-bold text-emerald-900 dark:text-emerald-300 block">{t('reports.trendPositive')}</span>
+            <span className="text-emerald-700/80 dark:text-emerald-400/80 text-[11px]">{t('reports.trendPositiveDesc')}</span>
           </div>
         </div>
 
@@ -244,8 +247,8 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
             <ShieldCheck className="w-4 h-4" />
           </div>
           <div>
-            <span className="font-bold text-slate-800 dark:text-slate-200 block">Qualidade Média</span>
-            <span className="text-slate-500 text-[11px]">84/100 de Índice Nutri semanal</span>
+            <span className="font-bold text-slate-800 dark:text-slate-200 block">{t('reports.avgQuality')}</span>
+            <span className="text-slate-500 text-[11px]">{t('reports.avgQualityDesc')}</span>
           </div>
         </div>
 
@@ -254,8 +257,8 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
             <Flame className="w-4 h-4" />
           </div>
           <div>
-            <span className="font-bold text-amber-900 dark:text-amber-300 block">Controle Calórico</span>
-            <span className="text-amber-700/80 dark:text-amber-400/80 text-[11px]">Dentro da meta em 6 dos 7 dias</span>
+            <span className="font-bold text-amber-900 dark:text-amber-300 block">{t('reports.calControl')}</span>
+            <span className="text-amber-700/80 dark:text-amber-400/80 text-[11px]">{t('reports.calControlDesc')}</span>
           </div>
         </div>
       </div>
@@ -272,9 +275,9 @@ export const WeeklyTrendsDashboard: React.FC<WeeklyTrendsDashboardProps> = ({ hi
                 <Flame className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-amber-900 dark:text-amber-100">Hora da Refeição!</h4>
+                <h4 className="text-sm font-bold text-amber-900 dark:text-amber-100">{t('reports.mealReminder')}</h4>
                 <p className="text-xs text-amber-700 dark:text-amber-300">
-                  Parece que faz tempo desde seu último registro. Mantenha seu plano alimentar em dia!
+                  {t('reports.mealReminderDesc')}
                 </p>
               </div>
             </div>

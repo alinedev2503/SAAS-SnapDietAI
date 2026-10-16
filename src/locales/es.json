@@ -11,10 +11,37 @@
     "disconnect": "Desconectar Cuenta de Google",
     "connect": "Conectar con Google",
     "achievements": {
+      "badge": "Sistema de Logros y Gamificación",
       "title": "Sistema de Logros y Gamificación",
       "subtitle": "Medallas de Hábitos y Metas Cumplidas",
       "unlocked": "Desbloqueadas",
-      "conquered": "Conquistada"
+      "conquered": "Conquistada",
+      "unlockedCount": "{{unlocked}} de {{total}} Desbloqueadas",
+      "goal": "Meta:",
+      "sodium_streak_7_title": "Maestro del Bajo Sodio",
+      "sodium_streak_7_desc": "7 días manteniendo el consumo de sodio rigurosamente dentro de la meta saludable.",
+      "sodium_streak_7_crit": "Mantener la meta de sodio por 7 días consecutivos",
+      "sodium_streak_7_unit": "días",
+      "taco_auditor_title": "Investigador TACO",
+      "taco_auditor_desc": "Auditó alimentos utilizando la base oficial de la Tabla TACO / UNICAMP.",
+      "taco_auditor_crit": "Realizar auditoría comparativa con la base TACO",
+      "taco_auditor_unit": "escaneos TACO",
+      "clean_label_hero_title": "Escudo Anti-Aditivos",
+      "clean_label_hero_desc": "Identificó y evitó más de 10 alimentos con aditivos artificiales y colorantes.",
+      "clean_label_hero_crit": "Comprar o analizar 10 productos libres de sustancias nocivas",
+      "clean_label_hero_unit": "productos limpios",
+      "protein_builder_title": "Foco Hipertrófico",
+      "protein_builder_desc": "Registró 5 comidas con alta densidad proteica (más de 15g por porción).",
+      "protein_builder_crit": "Escanear 5 productos ricos en proteína",
+      "protein_builder_unit": "ítems proteicos",
+      "nova_in_natura_title": "Amigo de lo Natural (In Natura)",
+      "nova_in_natura_desc": "Priorizó alimentos del Grupo NOVA 1 (mínimamente procesados).",
+      "nova_in_natura_crit": "Registrar 5 alimentos naturales o mínimamente procesados",
+      "nova_in_natura_unit": "alimentos naturales",
+      "scan_explorer_30_title": "Explorador de Pasillos",
+      "scan_explorer_30_desc": "Superó la marca de 20 etiquetas escaneadas y analizadas en el supermercado.",
+      "scan_explorer_30_crit": "Analizar 20 etiquetas en NutriLense AI",
+      "scan_explorer_30_unit": "escaneos"
     },
     "data": {
       "title": "Datos del Usuario",
@@ -24,6 +51,44 @@
     "dietary": {
       "title": "Restricciones Alimentarias y Condiciones de Salud",
       "desc": "Selecciona tus restricciones. El escáner de IA te alertará de inmediato al detectar ingredientes incompatibles."
+    },
+    "restrictionsList": {
+      "lactose": {
+        "label": "Intolerancia a la Lactosa",
+        "desc": "Alerta para leche, suero, mantequilla y derivados lácteos"
+      },
+      "gluten": {
+        "label": "Enfermedad Celíaca / Sin Gluten",
+        "desc": "Alerta para trigo, centeno, cebada y maltas"
+      },
+      "peanuts": {
+        "label": "Alergia al Maní y Frutos Secos",
+        "desc": "Alerta rigurosa para trazas de frutos secos y maní"
+      },
+      "sodium": {
+        "label": "Restricción de Sodio (Hipertensión)",
+        "desc": "Alerta para alimentos con más de 300mg de sodio"
+      },
+      "diabetes": {
+        "label": "Control de Glucemia / Diabetes",
+        "desc": "Alerta para jarabe de maíz, sacarosa y azúcares libres"
+      },
+      "vegan": {
+        "label": "Dieta Vegana",
+        "desc": "Alerta para ingredientes de origen animal y miel"
+      },
+      "vegetarian": {
+        "label": "Dieta Vegetariana",
+        "desc": "Alerta para carnes, pescados y gelatinas animales"
+      },
+      "soy": {
+        "label": "Alergia a la Soja",
+        "desc": "Alerta para lecitina y proteínas concentradas de soja"
+      },
+      "keto": {
+        "label": "Dieta Cetogénica (Keto)",
+        "desc": "Alerta para alimentos ricos en carbohidratos netos"
+      }
     },
     "nutriGoals": {
       "title": "Metas Diarias de Macronutrientes",
@@ -35,12 +100,15 @@
     "planAccount": {
       "title": "Configuración de Cuenta y Plan",
       "changePlan": "Cambiar Plan",
+      "upgradeDesc": "Mejorar a Pro o Plus",
       "editData": "Editar Datos",
       "editDesc": "Guardar cambios en el perfil",
       "cancelPlan": "Cancelar Plan",
       "cancelDesc": "Volver al plan gratuito",
       "deleteAccount": "Eliminar Cuenta",
-      "deleteDesc": "Borrar todos los datos y la cuenta"
+      "deleteDesc": "Borrar todos los datos y la cuenta",
+      "confirmDelete": "¿Estás seguro? Esto borrará todos tus datos y eliminará tu cuenta de la aplicación.",
+      "deleteSuccess": "Cuenta eliminada con éxito."
     }
   },
   "navbar": {
@@ -456,5 +524,127 @@
     "tacoBeans": "Frijoles, cocidos",
     "tacoChicken": "Pechuga de pollo, sin piel, cocida",
     "tacoEgg": "Huevo, gallina, entero, cocido"
+  },
+  "restrictions": {
+    "lactose": "Intolerancia a la Lactosa",
+    "gluten": "Sin Gluten / Celíaco",
+    "peanuts": "Alergia al Maní y Frutos Secos",
+    "sodium": "Restricción de Sodio",
+    "diabetes": "Control de Glucemia / Diabetes",
+    "vegan": "Dieta Vegana",
+    "vegetarian": "Dieta Vegetariana",
+    "soy": "Alergia a la Soja",
+    "keto": "Dieta Cetogénica (Keto)",
+    "hypertension": "Hipertensión Arterial",
+    "seafood": "Alergia a Mariscos"
+  },
+  "reports": {
+    "dashboardBadge": "Evolución y Tendencias Semanales (Recharts)",
+    "dashboardTitle": "Ingesta Semanal de Macronutrientes y Calorías",
+    "dashboardSubtitle": "Mapeo dinámico basado en productos escaneados y alimentos auditados vía TACO.",
+    "tabMacros": "Macronutrientes (g)",
+    "tabHealthScore": "Índice de Salud (0-100)",
+    "tabCalories": "Calorías vs. Meta",
+    "carbs": "Carbohidratos",
+    "protein": "Proteínas",
+    "fat": "Grasas Totales",
+    "calories": "Total Calórico",
+    "week": "semana",
+    "kcalWeek": "kcal / semana",
+    "chartProtein": "Proteínas (g)",
+    "chartCarbs": "Carbohidratos (g)",
+    "chartFat": "Grasas (g)",
+    "chartHealthScore": "Índice Nutri (0-100)",
+    "chartRealCal": "Consumo Real (kcal)",
+    "chartTargetCal": "Meta Diaria (kcal)",
+    "trendPositive": "Tendencia Positiva",
+    "trendPositiveDesc": "+14% de ingesta proteica semanal",
+    "avgQuality": "Calidad Media",
+    "avgQualityDesc": "84/100 de Índice Nutri semanal",
+    "calControl": "Control Calórico",
+    "calControlDesc": "Dentro de la meta en 6 de los 7 días",
+    "mealReminder": "¡Hora de la Comida!",
+    "mealReminderDesc": "Parece que ha pasado tiempo desde tu último registro. ¡Mantén tu plan alimentario al día!",
+    "officialTitle": "Informe Oficial de Progreso Mensual",
+    "officialSubtitle": "Exportación ejecutiva para seguimiento nutricional y consultas de salud.",
+    "print": "Imprimir",
+    "generatingPdf": "Generando PDF...",
+    "downloadPdf": "Descargar PDF",
+    "executiveSubtitle": "Informe Ejecutivo de Inteligencia Nutricional",
+    "referenceMonth": "Mes de Referencia",
+    "registeredUser": "Usuario Registrado",
+    "activeAlerts": "Restricciones y Alertas Activas",
+    "avgNutriIndex": "Índice Nutri Medio",
+    "excellentHealth": "Excelente Salud",
+    "totalScans": "Total de Escaneos",
+    "analyzedProducts": "Productos Analizados",
+    "proteinConsumed": "Proteína Consumida",
+    "recordedTotal": "Total Registrado",
+    "sodiumTracked": "Sodio Monitoreado",
+    "sodiumMonitoring": "Monitoreo de Sodio",
+    "harmfulAvoidedTitle": "Sustancias Nocivas Mapeadas y Evitadas en el Mes",
+    "noHarmful": "No se registraron aditivos de alto riesgo en las elecciones del mes.",
+    "aiOpinionTitle": "Evaluación Nutricional por IA",
+    "aiOpinionText": "El perfil nutricional demostrado en el mes presentó un Índice de Salud Medio de {{score}}/100, reflejando elecciones alineadas con sus restricciones de {{restrictions}}. La sustitución progresiva de alimentos ultraprocesados por opciones In Natura aumentó la ingesta proteica y mantuvo el control sobre aditivos como colorantes caramelo IV y nitritos.",
+    "footerText": "Generado por {{appName}} · Documento Personal para Seguimiento Nutricional · {{date}}",
+    "exportError": "Error al generar el PDF. Puedes imprimir directamente desde el navegador.",
+    "allHealth": "salud general"
+  },
+  "nutritionistsView": {
+    "badge": "Red Acreditada y Google Maps",
+    "title": "Encuentra al Nutricionista Más Cercano",
+    "subtitle": "Localiza profesionales certificados en tiempo real cerca de tu casa o trabajo. Comparte tu diario nutricional, historial de escaneos y metas calóricas para una atención 100% personalizada.",
+    "updateLocation": "Actualizar Mi Ubicación GPS",
+    "detectLocation": "Detectar Mi Ubicación GPS",
+    "verifiedBadge": "Profesionales verificados con colegiatura activa",
+    "quickCities": "Ciudades Populares:",
+    "searchPlaceholder": "Buscar barrio, clínica o especialidad...",
+    "specAll": "Todas",
+    "specClinical": "Clínica y Enfermedades Crónicas",
+    "specSports": "Nutrición Deportiva y Rendimiento",
+    "specFunctional": "Nutrición Funcional e Integrativa",
+    "specBehavioral": "Conducta Alimentaria y Mindful Eating",
+    "specMaternal": "Materno-Infantil y Pediatría",
+    "radius3": "Radio de 3 km",
+    "radius5": "Radio de 5 km",
+    "radius8": "Radio de 8 km",
+    "radius15": "Radio de 15 km",
+    "refreshSearch": "Actualizar búsqueda",
+    "errorNotFound": "No se encontraron nutricionistas en esta región.",
+    "errorConnection": "Fallo de conexión al buscar nutricionistas.",
+    "shareSuccess": "¡Resumen de tu historial nutricional copiado al portapapeles! Pégalo en tu conversación con el nutricionista.",
+    "shareMessage": "¡Hola {{nutriName}}! Me gustaría agendar una consulta. Soy usuario de {{appName}}. Mis restricciones alimentarias activas: {{restrictions}}. Meta diaria de calorías: {{calories}} kcal. Total de productos registrados en mi diario: {{scansCount}}.",
+    "mapTitle": "Mapa Interactivo de Especialistas",
+    "officesFound": "{{count}} consultorios encontrados",
+    "yourLocation": "Tu Ubicación",
+    "defaultRole": "Nutricionista Colegiado",
+    "getDirections": "Cómo Llegar",
+    "directions": "Cómo Llegar",
+    "loadingNearby": "Buscando nutricionistas más cercanos...",
+    "locationAttribution": "Ubicación aproximada basada en GPS / Red",
+    "nearbyTitle": "Nutricionistas Cercanos",
+    "sortedByDistance": "Ordenados por menor distancia",
+    "activeLicense": "COLEGIATURA ACTIVA",
+    "reviewsCount": "{{count}} opiniones",
+    "noNutritionistsFound": "No se encontraron nutricionistas con este filtro",
+    "noNutritionistsHint": "Intenta ampliar el radio de búsqueda o seleccionar otra especialidad.",
+    "call": "Llamar",
+    "callTitle": "Llamar al consultorio",
+    "whatsapp": "WhatsApp",
+    "whatsappTitle": "Enviar mensaje por WhatsApp al nutricionista",
+    "whatsappMessage": "¡Hola {{name}}! Encontré su perfil en {{appName}} e gostaria de agendar una consulta nutricional.",
+    "whatsappChatText": "¡Hola {{name}}! Encontré su perfil en {{appName}} e gostaria de agendar una consulta nutricional.",
+    "website": "Sitio Web",
+    "websiteTitle": "Visitar sitio web oficial del nutricionista",
+    "directions": "Cómo Llegar",
+    "directionsTitle": "Obtener ruta en Google Maps",
+    "sendDiary": "Enviar Diario",
+    "sendDiaryTitle": "Copiar resumen del diario nutricional para consulta",
+    "syncTitle": "Sincronización con tu Plan Alimentario",
+    "syncDesc": "Al acudir a tu cita, muestra la pestaña Informes PDF con tu historial de macronutrientes de la Tabla TACO.",
+    "insuranceAccepted": "Acepta Seguros Médicos",
+    "privateReceipt": "Particular con Recibo para Reembolso",
+    "inPersonTelehealth": "Consulta Presencial y Telemedicina",
+    "integratedPractice": "Consultorio Integrado de Nutrición, Sala {{suite}} — Cerca de ti"
   }
 }
