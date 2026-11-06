@@ -15,7 +15,7 @@ const DEFAULT_PROFILE: UserProfile = {
 };
 
 const DEFAULT_CONFIG: WhiteLabelConfig = {
-  appName: 'NutriLense AI',
+  appName: 'SnapDiet',
   primaryColor: '#059669', // emerald-600
   logoEmoji: '🥗',
   activeAdapter: 'local',
@@ -31,6 +31,10 @@ const SAMPLE_SCANS: ProductScan[] = [
     productName: 'Iogurte Natural Proteico 20g',
     brand: 'VerdeVida',
     servingSize: '200g',
+    price: 14.90,
+    packageWeightGrams: 200,
+    pricePer100g: 7.45,
+    pricePerProteinGram: 0.74,
     healthScore: 92,
     nutriScore: 'A',
     novaGroup: 1,
@@ -55,6 +59,19 @@ const SAMPLE_SCANS: ProductScan[] = [
     additives: [],
     triggeredAlerts: ['CONTÉM LACTOSE - Incompatível com seu perfil'],
     suggestedSwaps: [],
+    cheaperSwaps: [
+      {
+        productName: 'Iogurte Natural Simples + 2 Ovos Cozidos (TACO)',
+        brand: 'Marca Própria Supermercado',
+        estimatedPrice: 6.80,
+        pricePer100g: 3.40,
+        savingsPercent: 54,
+        savingsAmount: 8.10,
+        proteinPerServing: 24,
+        nutriScore: 'A',
+        reason: 'Mesma quantidade proteica com economia direta de R$ 8,10 no supermercado e maior saciedade.',
+      }
+    ],
     scannedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
   },
   {
@@ -65,6 +82,10 @@ const SAMPLE_SCANS: ProductScan[] = [
     productName: 'Refrigerante Cola Zero Açúcar',
     brand: 'MegaFizz',
     servingSize: '350ml',
+    price: 6.90,
+    packageWeightGrams: 350,
+    pricePer100g: 1.97,
+    pricePerProteinGram: 0,
     healthScore: 32,
     nutriScore: 'E',
     novaGroup: 4,
@@ -90,6 +111,19 @@ const SAMPLE_SCANS: ProductScan[] = [
     triggeredAlerts: ['ALTO EM ADITIVOS SINTÉTICOS', 'ULTRAPROCESSADO NOVA 4'],
     suggestedSwaps: [
       { productName: 'Kombucha Orgânica de Gengibre', brand: 'BioFlora', healthScore: 88, nutriScore: 'A', reason: 'Probiótico natural gaseificado sem conservantes' }
+    ],
+    cheaperSwaps: [
+      {
+        productName: 'Água com Gás + Limão Fresco da Feira',
+        brand: 'Preparo Caseiro / Feira Livre',
+        estimatedPrice: 2.20,
+        pricePer100g: 0.62,
+        savingsPercent: 68,
+        savingsAmount: 4.70,
+        proteinPerServing: 0,
+        nutriScore: 'A',
+        reason: 'Zero corante caramelo IV e economia de 68% contra o preço da lata no supermercado.',
+      }
     ],
     scannedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
   }
@@ -181,7 +215,17 @@ export class LocalAdapter implements StorageAdapter {
       localStorage.setItem(this.CONFIG_KEY, JSON.stringify(DEFAULT_CONFIG));
       return DEFAULT_CONFIG;
     }
-    return JSON.parse(raw);
+    try {
+      const parsed = JSON.parse(raw);
+      if (!parsed.appName || parsed.appName === 'NutriLense AI') {
+        parsed.appName = 'SnapDiet';
+        localStorage.setItem(this.CONFIG_KEY, JSON.stringify(parsed));
+      }
+      return parsed;
+    } catch {
+      localStorage.setItem(this.CONFIG_KEY, JSON.stringify(DEFAULT_CONFIG));
+      return DEFAULT_CONFIG;
+    }
   }
 
   async saveWhiteLabelConfig(config: Partial<WhiteLabelConfig>): Promise<WhiteLabelConfig> {

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWhiteLabel } from '../context/WhiteLabelContext';
 import { ProductCard } from '../components/ProductCard';
-import { Calendar, Trash2, Camera, Flame, HeartPulse, WifiOff, CheckCircle2, Cloud, RefreshCw } from 'lucide-react';
+import { DailyIntakeTracker } from '../components/DailyIntakeTracker';
+import { Calendar, Trash2, WifiOff, CheckCircle2, Cloud, RefreshCw } from 'lucide-react';
 import { ProductScan } from '../types/nutrition';
 import { dbService, SyncStatus } from '../services/db';
 
@@ -13,7 +14,7 @@ interface HistoryViewProps {
 
 export const HistoryView: React.FC<HistoryViewProps> = ({ onOpenScanner, onOpenSwaps }) => {
   const { t } = useTranslation();
-  const { history, profile, removeScan } = useWhiteLabel();
+  const { history, removeScan } = useWhiteLabel();
   const [syncStatus, setSyncStatus] = useState<SyncStatus>(dbService.getSyncStatus());
   const [syncingNow, setSyncingNow] = useState(false);
 
@@ -36,14 +37,6 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onOpenScanner, onOpenS
   const isOffline = !syncStatus.isOnline;
 
   const [scanToDelete, setScanToDelete] = useState<ProductScan | null>(null);
-
-  // Daily totals
-  const totalCalories = history.reduce((acc, s) => acc + (s.macronutrients?.calories || 0), 0);
-  const totalProtein = history.reduce((acc, s) => acc + (s.macronutrients?.protein || 0), 0);
-  const totalCarbs = history.reduce((acc, s) => acc + (s.macronutrients?.carbohydrates || 0), 0);
-  const totalFat = history.reduce((acc, s) => acc + (s.macronutrients?.totalFat || 0), 0);
-
-  const calPercentage = Math.min(100, Math.round((totalCalories / profile.targetCalories) * 100));
 
   const getDisplayProductName = (scan: ProductScan) => {
     if (scan.id === 'scan_sample_1' || scan.productName.toLowerCase().includes('iogurte natural proteico')) {
@@ -105,71 +98,8 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onOpenScanner, onOpenS
         </div>
       )}
       
-      {/* Daily Target Progress Bar */}
-      <div className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-              <HeartPulse className="w-4 h-4" />
-              {t('history.dailyDiary')}
-            </span>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-              {t('history.summaryTitle')}
-            </h2>
-          </div>
-
-          <button
-            onClick={onOpenScanner}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
-          >
-            <Camera className="w-4 h-4" />
-            <span>{t('history.scanProduct')}</span>
-          </button>
-        </div>
-
-        {/* Caloric Bar */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-xs font-bold font-mono">
-            <span className="text-slate-700 dark:text-slate-300">
-              {totalCalories} / {profile.targetCalories} kcal ({calPercentage}%)
-            </span>
-            <span className="text-slate-500">
-              {totalCalories > profile.targetCalories
-                ? t('history.kcalExceeded', { count: totalCalories - profile.targetCalories })
-                : t('history.kcalRemaining', { count: profile.targetCalories - totalCalories })}
-            </span>
-          </div>
-          <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-            <div
-              className={`h-full transition-all duration-500 ${
-                calPercentage > 100 ? 'bg-rose-500' : 'bg-emerald-500'
-              }`}
-              style={{ width: `${calPercentage}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Macros Summary Grid */}
-        <div className="grid grid-cols-3 gap-3 pt-2 text-center text-xs">
-          <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
-            <span className="text-slate-500 block text-[10px]">{t('history.protein')}</span>
-            <span className="font-bold text-emerald-600 font-mono text-sm">{totalProtein}g</span>
-            <span className="text-[10px] text-slate-400 block">{t('history.target', { target: profile.targetProtein })}</span>
-          </div>
-
-          <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
-            <span className="text-slate-500 block text-[10px]">{t('history.carbs')}</span>
-            <span className="font-bold text-slate-800 dark:text-slate-200 font-mono text-sm">{totalCarbs}g</span>
-            <span className="text-[10px] text-slate-400 block">{t('history.target', { target: profile.targetCarbs })}</span>
-          </div>
-
-          <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
-            <span className="text-slate-500 block text-[10px]">{t('history.fat')}</span>
-            <span className="font-bold text-slate-800 dark:text-slate-200 font-mono text-sm">{totalFat}g</span>
-            <span className="text-[10px] text-slate-400 block">{t('history.target', { target: profile.targetFat })}</span>
-          </div>
-        </div>
-      </div>
+      {/* Daily Water & Caloric Intake Tracker */}
+      <DailyIntakeTracker onOpenScanner={onOpenScanner} />
 
       {/* Scanned Items Feed */}
       <div className="space-y-4">

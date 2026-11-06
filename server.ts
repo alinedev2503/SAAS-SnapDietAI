@@ -535,14 +535,34 @@ app.post('/api/gemini/analyze-product', async (req, res) => {
       return res.json({ success: true, product: fallback, source: 'fallback' });
     }
 
+    const weeklyBudget = Number(req.body.weeklyBudget || req.body.tetoGastosSemanal || 150.00);
+
     // Injeta a base oficial de dados da Tabela TACO (NEPA/UNICAMP) no prompt
     const tacoContextPrompt = buildTacoContextPrompt();
-    
-    const promptText = `Você é um nutricionista e bioquímico alimentar de elite no Brasil.
-    Sua missão é analisar minuciosamente a foto deste ${scanCategory === 'prato_pronto' ? 'prato de comida (seja preparado em casa ou em restaurante)' : 'produto industrializado (rótulo)'} (ou o código de barras "${barcode || ''}") e aplicar um rigoroso PROTOCOLO DE AUDITORIA DUPLA.
-    ${scanCategory === 'prato_pronto' ? 'Utilize seu conhecimento de gastronomia e nutrição para estimar os ingredientes, porções e valores nutricionais, fundamentando-se na Tabela TACO.' : 'Leia o rótulo atentamente e valide os dados declarados.'}
-    
-    ${tacoContextPrompt}
+
+    const systemInstruction = `Você é o motor de inteligência artificial do 'SnapDiet / Mercado Barato', um assistente especializado em proteção financeira e inteligência de compras para o consumidor no Brasil.
+Sua missão principal NÃO é focar em restrição de dieta sofisticada, mas sim em ECONOMIA DOMÉSTICA, custo-benefício por 100g/ml, tradução de ingredientes ocultos e alternativas baratas de mercado.
+
+Ao receber a imagem de um rótulo ou produto e o teto de gastos do usuário:
+1. Identifique o produto e estime/calcule o preço padrão de mercado por 100g ou unidade equivalente.
+2. Aponte se há aditivos químicos excessivos ou se o produto é superfaturado pela marca.
+3. Sugira uma alternativa caseira ou de marca mais barata que cumpra o mesmo papel na despensa.
+4. Avalie o impacto no orçamento semanal informado.
+
+Mantenha a resposta estritamente estruturada em JSON (sem rodeios médicos ou acadêmicos, use linguagem popular e direta).`;
+
+    const promptText = `Analise a foto deste produto anexada ${barcode ? `(código de barras EAN: "${barcode}")` : ''}.
+O teto de gastos semanal atual do usuário é de R$ ${weeklyBudget.toFixed(2)}.
+${req.body.shelfPrice ? `O usuário informou que o preço na gôndola é R$ ${Number(req.body.shelfPrice).toFixed(2)}. Utilize este valor real para calcular o preço por 100g e por grama de proteína.` : 'Se houver etiqueta de preço visível na gôndola/foto, extraia o preço. Se não houver, estime um preço de mercado realista no varejo brasileiro (R$).'}
+
+Retorne a análise contendo:
+- Nome do Produto e Categoria.
+- Custo-benefício aproximado (Preço por 100g).
+- Alerta de economia (Vale a pena ou é desperdício de dinheiro? Superfaturado pela marca?).
+- Sugestão de substituição mais barata ou caseira.
+- Avaliação do impacto no orçamento semanal informado de R$ ${weeklyBudget.toFixed(2)}.
+
+${tacoContextPrompt}
 
 PROTOCOLO DE AUDITORIA DUPLA OBRIGATÓRIO:
 1. EXTRAÇÃO PRIMÁRIA: Leia atentamente os dados visíveis no rótulo da embalagem (marca, porção, calorias, macronutrientes declarados, lista legível de ingredientes, alérgenos e aditivos).
@@ -550,12 +570,8 @@ PROTOCOLO DE AUDITORIA DUPLA OBRIGATÓRIO:
    - Utilize a Tabela TACO (NEPA/UNICAMP 4ª Edição) fornecida acima como sua referência analítica e biológica de controle.
    - Encontre o alimento base correspondente na TACO (ex: Iogurte natural, Aveia em flocos, Peito de frango, Arroz integral, Biscoito, Refrigerante, etc.).
    - Normalize os macronutrientes para a base de 100g e compare com os valores laboratoriais da TACO.
-   - Audite se há excesso de sódio artificial (+150% do alimento base), se faltam fibras para alimentos que se dizem integrais, ou se há açúcares ocultos camuflados (maltodextrina, xarope de milho, sacarose, dextrose) contrastando com alegações de "zero açúcar".
-   - Defina o campo "validationStatus":
-     * "conforme": Se os macronutrientes e calorias forem coerentes com a matriz analítica oficial da TACO.
-     * "divergente": Se houver variação relevante de carboidratos, proteínas ou densidade energética em relação ao alimento de referência.
-     * "alerta": Se houver sódio crítico, aditivos ultraprocessados de alto risco ou açúcares escondidos que contradizem o rótulo.
-   - Escreva notas de auditoria em "auditNotes" justificando a avaliação com rigor científico e cite as divergências em "discrepancies".
+   - Audite se há excesso de sódio artificial (+150% do alimento base), se faltam fibras para alimentos que se dizem integrais, ou se há açúcares ocultos camuflados.
+   - Defina o campo "validationStatus": "conforme" | "divergente" | "alerta".
 
 As restrições alimentares do usuário são: [${userRestrictions.join(', ')}].
 
@@ -565,6 +581,27 @@ Forneça uma resposta estritamente em formato JSON com o seguinte esquema precis
   "brand": "Marca do fabricante (ou 'In Natura / Preparado')",
   "barcode": "${barcode || ''}",
   "servingSize": "Tamanho da porção (ex: 100g ou 1 porção de 30g)",
+  "price": 14.90,
+  "packageWeightGrams": 200,
+  "pricePer100g": 7.45,
+  "pricePerProteinGram": 0.74,
+  "economicVerdict": "Vale a pena" ou "Desperdício de dinheiro / Superfaturado",
+  "economicAlert": "Texto popular e direto explicando se vale a pena comprar ou se é superfaturado pela marca",
+  "homemadeSwap": "Sugestão prática de alternativa caseira ou de marca própria mais barata que cumpre o mesmo papel na despensa",
+  "budgetImpactAnalysis": "Impacto percentual e financeiro no teto semanal de R$ ${weeklyBudget.toFixed(2)}",
+  "cheaperSwaps": [
+    {
+      "productName": "Nome de substituto mais barato no mercado",
+      "brand": "Marca Própria Supermercado ou Feira",
+      "estimatedPrice": 6.80,
+      "pricePer100g": 3.40,
+      "savingsPercent": 54,
+      "savingsAmount": 8.10,
+      "proteinPerServing": 22,
+      "nutriScore": "A",
+      "reason": "Por que esta opção economiza dinheiro e mantém ou eleva as proteínas"
+    }
+  ],
   "tacoReference": "TACO #ID - Nome do Alimento (NEPA/UNICAMP 4ª Edição)",
   "tacoValidation": {
     "matchedTacoItem": "Nome do alimento correspondente na TACO",
@@ -632,6 +669,7 @@ Regras estritas:
       model: 'gemini-3.8-flash',
       contents: { parts },
       config: {
+        systemInstruction,
         responseMimeType: 'application/json',
         temperature: 0.2,
       },
@@ -722,6 +760,31 @@ function generateFallbackAnalysis(barcode?: string, userRestrictions: string[] =
     productName,
     brand: 'NutriFit Pro',
     barcode: barcode || '7898000112233',
+    price: 12.90,
+    packageWeightGrams: 200,
+    pricePer100g: 6.45,
+    pricePerProteinGram: isHealthy ? 0.76 : 3.07,
+    economicVerdict: isHealthy ? 'Vale a pena' : 'Desperdício de dinheiro / Superfaturado',
+    economicAlert: isHealthy
+      ? 'Bom custo-benefício por 100g e proteína em relação à média do supermercado.'
+      : 'Produto superfaturado pelo apelo de embalagem. Mais de 45% do custo é margem da marca e açúcar disfarçado.',
+    homemadeSwap: isHealthy
+      ? 'Compre aveia em flocos e sementes a granel na feira e asse em casa por R$ 3,20 o lote.'
+      : 'Pipoca de milho caseira feita na panela com fio de azeite e ervas secas: 70% mais barata e rica em fibras.',
+    budgetImpactAnalysis: 'Representa 8,6% do teto semanal de R$ 150,00.',
+    cheaperSwaps: [
+      {
+        productName: isHealthy ? 'Aveia em Flocos a Granel + Castanhas da Feira' : 'Pipoca de Milho Caseira com Ervas',
+        brand: 'Zona Cerealista / Feira Livre',
+        estimatedPrice: 5.40,
+        pricePer100g: 2.70,
+        savingsPercent: 58,
+        savingsAmount: 7.50,
+        proteinPerServing: isHealthy ? 9.5 : 3.0,
+        nutriScore: 'A',
+        reason: 'Alimento In Natura sem açúcar escondido e 58% mais barato que a barra industrializada.',
+      }
+    ],
     tacoReference: `TACO #${tacoValidation.tacoId} — ${tacoValidation.matchedTacoItem} (NEPA/UNICAMP 4ª Edição)`,
     tacoValidation,
     healthScore,
@@ -756,6 +819,284 @@ function generateFallbackAnalysis(barcode?: string, userRestrictions: string[] =
     ],
   };
 }
+
+// Helper: Generates realistic weekly budget meal plan within user's budget ceiling
+function generateFallbackBudgetPlan(weeklyBudget: number = 150, currency: string = 'BRL', restrictions: string[] = []) {
+  const isUS = currency === 'USD';
+  const targetBudget = Math.max(isUS ? 30 : 80, weeklyBudget);
+  const ratio = targetBudget / (isUS ? 50 : 150);
+
+  const groceryList = [
+    {
+      id: 'g_1',
+      name: 'Cartela de Ovos (30 unidades)',
+      category: 'proteinas' as const,
+      quantityText: '1 cartela (30 ovos)',
+      estimatedPrice: Math.round((isUS ? 6.50 : 19.90) * ratio * 100) / 100,
+      proteinTotalGrams: 180,
+      caloriesTotal: 2100,
+      isBought: false,
+      tacoRef: 'TACO #045 - Ovo galinha cozido',
+      savingsTip: 'Proteína completa mais barata do mercado (R$ 0,11/g de proteína).',
+    },
+    {
+      id: 'g_2',
+      name: 'Peito de Frango Congelado (Filé)',
+      category: 'proteinas' as const,
+      quantityText: '1.5 kg',
+      estimatedPrice: Math.round((isUS ? 11.50 : 28.50) * ratio * 100) / 100,
+      proteinTotalGrams: 345,
+      caloriesTotal: 1800,
+      isBought: false,
+      tacoRef: 'TACO #285 - Peito de frango sem pele cozido',
+      savingsTip: 'Compre no atacarejo ou pacotes promocionais de 1kg para economizar 30%.',
+    },
+    {
+      id: 'g_3',
+      name: 'Arroz Integral ou Branco Tipo 1',
+      category: 'graos_cereais' as const,
+      quantityText: '1 kg',
+      estimatedPrice: Math.round((isUS ? 2.50 : 6.80) * ratio * 100) / 100,
+      proteinTotalGrams: 75,
+      caloriesTotal: 3600,
+      isBought: false,
+      tacoRef: 'TACO #005 - Arroz integral cozido',
+      savingsTip: 'Base de energia limpa com excelente rendimento e saciedade.',
+    },
+    {
+      id: 'g_4',
+      name: 'Feijão Preto ou Carioca Tipo 1',
+      category: 'graos_cereais' as const,
+      quantityText: '1 kg',
+      estimatedPrice: Math.round((isUS ? 3.00 : 7.90) * ratio * 100) / 100,
+      proteinTotalGrams: 140,
+      caloriesTotal: 2800,
+      isBought: false,
+      tacoRef: 'TACO #019 - Feijão carioca cozido',
+      savingsTip: 'Combinação perfeita com arroz para perfil de aminoácidos completo.',
+    },
+    {
+      id: 'g_5',
+      name: 'Aveia em Flocos Finos (Pacote Econômico)',
+      category: 'graos_cereais' as const,
+      quantityText: '500g',
+      estimatedPrice: Math.round((isUS ? 2.20 : 5.50) * ratio * 100) / 100,
+      proteinTotalGrams: 70,
+      caloriesTotal: 1950,
+      isBought: false,
+      tacoRef: 'TACO #009 - Aveia em flocos',
+      savingsTip: 'Substitui cereais matinais ultraprocessados por 1/3 do preço.',
+    },
+    {
+      id: 'g_6',
+      name: 'Banana Prata / Nanica da Estação',
+      category: 'hortifruti' as const,
+      quantityText: '1.5 kg',
+      estimatedPrice: Math.round((isUS ? 2.80 : 7.20) * ratio * 100) / 100,
+      proteinTotalGrams: 15,
+      caloriesTotal: 1200,
+      isBought: false,
+      tacoRef: 'TACO #180 - Banana prata crua',
+      savingsTip: 'Fruta mais barata do Brasil por caloria e fonte de potássio e fibras.',
+    },
+    {
+      id: 'g_7',
+      name: 'Batata-Doce ou Mandioca',
+      category: 'hortifruti' as const,
+      quantityText: '1.5 kg',
+      estimatedPrice: Math.round((isUS ? 3.20 : 7.50) * ratio * 100) / 100,
+      proteinTotalGrams: 18,
+      caloriesTotal: 1400,
+      isBought: false,
+      tacoRef: 'TACO #090 - Batata doce cozida',
+      savingsTip: 'Carboidrato de baixo índice glicêmico por menos da metade do preço de pães.',
+    },
+    {
+      id: 'g_8',
+      name: 'Cenoura e Abobrinha da Época',
+      category: 'hortifruti' as const,
+      quantityText: '1 kg',
+      estimatedPrice: Math.round((isUS ? 2.60 : 6.20) * ratio * 100) / 100,
+      proteinTotalGrams: 12,
+      caloriesTotal: 400,
+      isBought: false,
+      tacoRef: 'TACO #110 - Cenoura crua',
+      savingsTip: 'Aproveite legumes da safra na feira livre para menor preço.',
+    },
+    {
+      id: 'g_9',
+      name: 'Iogurte Natural Integral ou Leite Desnatado',
+      category: 'laticinios' as const,
+      quantityText: '2 Litros',
+      estimatedPrice: Math.round((isUS ? 4.80 : 10.80) * ratio * 100) / 100,
+      proteinTotalGrams: 64,
+      caloriesTotal: 840,
+      isBought: false,
+      tacoRef: 'TACO #440 - Leite desnatado',
+      savingsTip: 'Marcas próprias de laticínios entregam a mesma proteína por 35% a menos.',
+    },
+    {
+      id: 'g_10',
+      name: 'Azeite de Oliva ou Óleo de Girassol + Temperos',
+      category: 'despensa' as const,
+      quantityText: '1 frasco / sachê',
+      estimatedPrice: Math.round((isUS ? 5.00 : 14.50) * ratio * 100) / 100,
+      proteinTotalGrams: 0,
+      caloriesTotal: 1800,
+      isBought: false,
+      tacoRef: 'TACO #550 - Óleos vegetais',
+      savingsTip: 'Alho, cebola e açafrão em pó dão sabor gourmet sem gastar em molhos prontos.',
+    },
+  ];
+
+  const totalEstimatedCost = Math.round(groceryList.reduce((acc, item) => acc + item.estimatedPrice, 0) * 100) / 100;
+  const totalSavingsVsBrandNames = Math.round(totalEstimatedCost * 0.45 * 100) / 100;
+
+  const daysOfWeek = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+  const mealTemplates = [
+    {
+      breakfast: 'Omelete de 2 ovos com aveia em flocos e café preto sem açúcar',
+      lunch: 'Peito de frango grelhado (180g), arroz com feijão e cenoura ralada',
+      snack: 'Banana amassada com 2 colheres de aveia e canela',
+      dinner: 'Ovos mexidos com batata-doce cozida e salada de abobrinha',
+      dailyCostEstimated: Math.round((totalEstimatedCost / 7) * 100) / 100,
+      dailyProteinGrams: 118,
+      dailyCalories: 1980,
+    },
+    {
+      breakfast: 'Mingau protéico de aveia com leite desnatado e rodelas de banana',
+      lunch: 'Frango desfiado com purê de batata-doce, feijão preto e salada verde',
+      snack: 'Iogurte natural com pedaços de banana e canela',
+      dinner: 'Omelete com legumes picados e 1 porção de arroz com feijão',
+      dailyCostEstimated: Math.round((totalEstimatedCost / 7) * 100) / 100,
+      dailyProteinGrams: 112,
+      dailyCalories: 1920,
+    },
+  ];
+
+  const meals = daysOfWeek.map((day, idx) => {
+    const tpl = mealTemplates[idx % mealTemplates.length];
+    return {
+      day,
+      breakfast: tpl.breakfast,
+      lunch: tpl.lunch,
+      snack: tpl.snack,
+      dinner: tpl.dinner,
+      dailyCostEstimated: tpl.dailyCostEstimated,
+      dailyProteinGrams: tpl.dailyProteinGrams,
+      dailyCalories: tpl.dailyCalories,
+    };
+  });
+
+  return {
+    id: `plan_${Date.now()}`,
+    weeklyBudget: targetBudget,
+    currency,
+    totalEstimatedCost,
+    totalSavingsVsBrandNames,
+    aiAdvice: isUS
+      ? 'Shop seasonal produce, buy eggs and oats in bulk, and swap name-brand snacks for homemade protein combos.'
+      : 'Estratégia SnapDiet: ovos e peito de frango no atacarejo garantem R$ 0,12/g de proteína. Comprar feijão e arroz Tipo 1 garante saciedade e corta 50% dos ultraprocessados.',
+    meals,
+    groceryList,
+    createdAt: new Date().toISOString(),
+  };
+}
+
+// Endpoint for SnapDiet "Mercado Barato" - Weekly Budget Meal Planner & Smart Grocery List
+app.post('/api/gemini/budget-meal-plan', async (req, res) => {
+  try {
+    const {
+      weeklyBudget = 150,
+      currency = 'BRL',
+      dietaryRestrictions = [],
+      targetCalories = 2000,
+      targetProtein = 120,
+    } = req.body;
+
+    const isUS = currency === 'USD';
+    const budgetNum = Number(weeklyBudget) || (isUS ? 50 : 150);
+
+    const promptText = `Você é o motor de inteligência financeira e nutricional do aplicativo SnapDiet (Conceito: "Mercado Barato").
+Sua missão de ouro é combater a inflação dos alimentos e montar um CARDÁPIO SEMANAL ECONÔMICO + LISTA DE COMPRAS INTELIGENTE cujo custo total estimado NÃO ULTRAPASSE o orçamento semanal informado pelo usuário.
+
+Dados do usuário:
+- Orçamento Semanal Máximo: ${isUS ? `$${budgetNum}` : `R$ ${budgetNum}`}
+- Moeda: ${currency}
+- Restrições alimentares ativas: [${dietaryRestrictions.join(', ') || 'Nenhuma'}]
+- Meta calórica diária: ~${targetCalories} kcal
+- Meta diária de proteína: ~${targetProtein}g
+
+Diretrizes Estritas do "Mercado Barato":
+1. O custo total da lista de compras somada DEVE ser rigorosamente menor ou igual a ${budgetNum}.
+2. Priorize alimentos de altíssimo custo-benefício nutricional (In Natura / TACO): ovos caipiras ou brancos em cartela, peito de frango, sardinha fresca/enlatada, arroz, feijão preto/carioca, aveia em flocos finos, banana da estação, batata-doce, cenoura, espinafre e azeite/óleo de girassol.
+3. Evite marcas caras e substitua alimentos da moda ultraprocessados por alternativas baratas e proteicas.
+4. Categorize a lista de compras em: "hortifruti", "proteinas", "graos_cereais", "laticinios", "despensa".
+5. Calcule a economia estimada ("totalSavingsVsBrandNames") que o usuário terá em relação a comprar produtos industrializados de marcas caras.
+
+Forneça uma resposta estritamente em formato JSON com o seguinte esquema:
+{
+  "id": "plan_${Date.now()}",
+  "weeklyBudget": ${budgetNum},
+  "currency": "${currency}",
+  "totalEstimatedCost": 142.50,
+  "totalSavingsVsBrandNames": 68.30,
+  "aiAdvice": "Dica prática da IA de como comprar na feira e no atacarejo para economizar ainda mais.",
+  "meals": [
+    {
+      "day": "Segunda-feira",
+      "breakfast": "Ovos mexidos com aveia e banana",
+      "lunch": "Frango desfiado com arroz integral e feijão",
+      "snack": "Iogurte natural batido com frutas da estação",
+      "dinner": "Omelete com legumes picados e salada verde",
+      "dailyCostEstimated": 19.80,
+      "dailyProteinGrams": 115,
+      "dailyCalories": 1950
+    }
+  ],
+  "groceryList": [
+    {
+      "id": "item_1",
+      "name": "Cartela de Ovos (30 unid)",
+      "category": "proteinas",
+      "quantityText": "1 cartela",
+      "estimatedPrice": 18.50,
+      "proteinTotalGrams": 180,
+      "caloriesTotal": 2100,
+      "isBought": false,
+      "tacoRef": "TACO #045 - Ovo de galinha inteiro",
+      "savingsTip": "Melhor custo por grama de proteína do mercado (R$ 0,10/g)."
+    }
+  ]
+}
+
+Responda APENAS o JSON válido sem blocos markdown adicionais.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.8-flash',
+      contents: promptText,
+      config: {
+        responseMimeType: 'application/json',
+        temperature: 0.3,
+      },
+    });
+
+    const rawText = response.text || '';
+    let parsedPlan;
+    try {
+      parsedPlan = JSON.parse(rawText);
+    } catch (e) {
+      console.error('Failed to parse Gemini budget meal plan JSON, using fallback:', rawText);
+      parsedPlan = generateFallbackBudgetPlan(budgetNum, currency, dietaryRestrictions);
+    }
+
+    return res.json({ success: true, plan: parsedPlan, source: 'gemini' });
+  } catch (err: any) {
+    console.error('Error generating budget meal plan:', err);
+    const fallback = generateFallbackBudgetPlan(req.body.weeklyBudget || 150, req.body.currency || 'BRL', req.body.dietaryRestrictions || []);
+    return res.json({ success: true, plan: fallback, source: 'fallback', error: err.message });
+  }
+});
 
 // Vite development middleware attachment
 async function setupServer() {

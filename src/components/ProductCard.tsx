@@ -15,6 +15,10 @@ import {
   Scale,
   CheckCircle2,
   Info,
+  PiggyBank,
+  TrendingDown,
+  Tag,
+  DollarSign,
 } from 'lucide-react';
 import { auditProductAgainstTaco } from '../data/tacoDatabase';
 
@@ -432,6 +436,153 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
           </div>
         )}
       </div>
+
+      {/* Mercado Barato & Custo-Benefício Inteligente */}
+      {(scan.price !== undefined || scan.pricePer100g !== undefined) && (
+        <div className="p-5 border-b border-slate-100 dark:border-slate-800 bg-amber-50/40 dark:bg-amber-950/20">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-1.5">
+              <PiggyBank className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
+                {t('productCard.marketTitle', 'Mercado Barato · Custo-Benefício')}
+              </h4>
+            </div>
+            {scan.price !== undefined && (
+              <span className="text-xs font-mono font-bold text-amber-800 dark:text-amber-300 px-2.5 py-0.5 bg-amber-100 dark:bg-amber-900/60 rounded-md border border-amber-300/60 dark:border-amber-800/60">
+                R$ {scan.price.toFixed(2)}
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {scan.pricePer100g !== undefined && (
+              <div className="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-amber-200/60 dark:border-amber-900/40 text-center">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">
+                  {t('productCard.pricePer100g', 'Preço por 100g')}
+                </span>
+                <span className="text-sm font-bold font-mono text-slate-900 dark:text-white">
+                  R$ {scan.pricePer100g.toFixed(2)}
+                </span>
+              </div>
+            )}
+
+            {scan.pricePerProteinGram !== undefined && (
+              <div className="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-amber-200/60 dark:border-amber-900/40 text-center">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">
+                  {t('productCard.pricePerProtein', 'Custo / g Proteína')}
+                </span>
+                <span className="text-sm font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                  R$ {scan.pricePerProteinGram.toFixed(2)}/g
+                </span>
+              </div>
+            )}
+
+            {scan.packageWeightGrams !== undefined && (
+              <div className="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-amber-200/60 dark:border-amber-900/40 text-center col-span-2 sm:col-span-1">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">
+                  {t('productCard.packageWeight', 'Peso Embalagem')}
+                </span>
+                <span className="text-sm font-bold font-mono text-slate-900 dark:text-white">
+                  {scan.packageWeightGrams}g
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Cheaper Supermarket Substitutes */}
+          {scan.cheaperSwaps && scan.cheaperSwaps.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-amber-200/50 dark:border-amber-900/50 space-y-2">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-amber-950 dark:text-amber-200">
+                <TrendingDown className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span>{t('productCard.cheaperSwapsTitle', 'Substituto Mais Barato no Supermercado')}</span>
+              </div>
+
+              {scan.cheaperSwaps.map((swap, sIdx) => (
+                <div
+                  key={sIdx}
+                  className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-emerald-300 dark:border-emerald-800 shadow-xs"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-bold text-slate-900 dark:text-white">
+                          {swap.productName}
+                        </span>
+                        <span className="text-[10px] px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 rounded font-bold">
+                          {swap.nutriScore}
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">
+                        {swap.brand} · R$ {swap.pricePer100g.toFixed(2)}/100g
+                      </span>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <span className="text-xs font-mono font-bold text-slate-900 dark:text-white block">
+                        R$ {swap.estimatedPrice.toFixed(2)}
+                      </span>
+                      <span className="inline-flex items-center text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 px-1.5 py-0.5 rounded">
+                        -{swap.savingsPercent}% (Economize R$ {swap.savingsAmount.toFixed(2)})
+                      </span>
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-2 bg-slate-50 dark:bg-slate-800/60 p-2 rounded-lg">
+                    💡 {swap.reason}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Economic Verdict & Budget Impact */}
+          {(scan.economicVerdict || scan.economicAlert || scan.budgetImpactAnalysis) && (
+            <div className="mt-3 p-3 bg-white dark:bg-slate-900 rounded-xl border border-amber-200/80 dark:border-amber-900/60 space-y-1.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <Tag className="w-3.5 h-3.5 text-amber-600" />
+                  {t('productCard.verdictTitle', 'Veredito Econômico:')}
+                </span>
+                {scan.economicVerdict && (
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      scan.economicVerdict.toLowerCase().includes('vale a pena')
+                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300'
+                        : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-300'
+                    }`}
+                  >
+                    {scan.economicVerdict}
+                  </span>
+                )}
+              </div>
+
+              {scan.economicAlert && (
+                <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                  {scan.economicAlert}
+                </p>
+              )}
+
+              {scan.budgetImpactAnalysis && (
+                <p className="text-[11px] text-amber-800 dark:text-amber-400 font-medium">
+                  📊 {scan.budgetImpactAnalysis}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Homemade Swap Tip */}
+          {scan.homemadeSwap && (
+            <div className="mt-2.5 p-3 bg-emerald-50/60 dark:bg-emerald-950/30 rounded-xl border border-emerald-200/60 dark:border-emerald-900/40">
+              <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300 block mb-0.5">
+                🥣 {t('productCard.homemadeTitle', 'Substituição Caseira / Alternativa Barata:')}
+              </span>
+              <p className="text-xs text-emerald-900 dark:text-emerald-200 leading-relaxed">
+                {scan.homemadeSwap}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Beneficial vs Harmful Substances Breakdown */}
       <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">

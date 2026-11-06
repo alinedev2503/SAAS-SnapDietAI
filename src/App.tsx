@@ -11,6 +11,7 @@ import { ProfileView } from './views/ProfileView';
 import { WhiteLabelAdminView } from './views/WhiteLabelAdminView';
 import { MonthlyReportPdf } from './components/MonthlyReportPdf';
 import { NutritionistFinderView } from './views/NutritionistFinderView';
+import { MarketBudgetView } from './views/MarketBudgetView';
 import { ProductScan } from './types/nutrition';
 
 function MainAppContent() {
@@ -40,6 +41,12 @@ function MainAppContent() {
           <LandingPage
             onOpenScanner={() => setIsScannerOpen(true)}
             onNavigateToTab={(tab) => setActiveTab(tab)}
+          />
+        )}
+
+        {activeTab === 'budget' && (
+          <MarketBudgetView
+            onOpenScanner={() => setIsScannerOpen(true)}
           />
         )}
 

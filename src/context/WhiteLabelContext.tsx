@@ -38,7 +38,7 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
 
   const [config, setConfig] = useState<WhiteLabelConfig>({
-    appName: 'NutriLense AI',
+    appName: 'SnapDiet',
     primaryColor: '#059669',
     logoEmoji: '🥗',
     activeAdapter: 'firebase',
@@ -84,7 +84,8 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const savedPlan = (localStorage.getItem('nutrilense_current_plan') as PlanTier) || conf.currentPlan || 'free';
       const scanLimit = savedPlan === 'plus' ? 60 : savedPlan === 'pro' ? 20 : 2;
 
-      setConfig({ ...conf, currentPlan: savedPlan, demoMaxScans: scanLimit });
+      const appName = (!conf.appName || conf.appName === 'NutriLense AI') ? 'SnapDiet' : conf.appName;
+      setConfig({ ...conf, appName, currentPlan: savedPlan, demoMaxScans: scanLimit });
       setCurrentPlanState(savedPlan);
       setProfile(prof);
       setHistory(hist);

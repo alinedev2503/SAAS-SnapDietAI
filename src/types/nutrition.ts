@@ -31,6 +31,18 @@ export interface SuggestedSwap {
   reason: string;
 }
 
+export interface CheaperSwap {
+  productName: string;
+  brand: string;
+  estimatedPrice: number;
+  pricePer100g: number;
+  savingsPercent: number; // Ex: 38%
+  savingsAmount: number; // Ex: R$ 6.50
+  proteinPerServing: number;
+  nutriScore: NutriScoreGrade;
+  reason: string;
+}
+
 export interface TacoBenchmarkNutrients {
   calories: number;
   protein: number;
@@ -62,6 +74,15 @@ export interface ProductScan {
   brand: string;
   imageUrl?: string;
   servingSize: string;
+  price?: number; // Preço na gôndola (ex: R$ 14.90)
+  packageWeightGrams?: number; // Peso líquido total (ex: 400g)
+  pricePer100g?: number; // Preço calculado por 100g (ex: R$ 3.72)
+  pricePerProteinGram?: number; // Custo em R$ por grama de proteína (ex: R$ 0.12)
+  cheaperSwaps?: CheaperSwap[]; // Substitutos mais baratos e inteligentes no supermercado
+  economicVerdict?: 'Vale a pena' | 'Desperdício de dinheiro' | 'Superfaturado' | 'Razoável' | string;
+  economicAlert?: string; // Alerta de economia (Vale a pena ou é desperdício de dinheiro?)
+  homemadeSwap?: string; // Sugestão de substituição mais barata ou caseira
+  budgetImpactAnalysis?: string; // Avaliação do impacto no orçamento semanal informado
   tacoReference?: string;
   tacoValidation?: TacoValidation;
   healthScore: number; // 0 to 100
@@ -77,6 +98,44 @@ export interface ProductScan {
   suggestedSwaps: SuggestedSwap[];
   scannedAt: string; // ISO string date
   scanCategory: ScanCategory;
+}
+
+export type GroceryCategory = 'hortifruti' | 'proteinas' | 'graos_cereais' | 'laticinios' | 'despensa';
+
+export interface GroceryItem {
+  id: string;
+  name: string;
+  category: GroceryCategory;
+  quantityText: string; // Ex: "1 kg", "1 dúzia", "500g"
+  estimatedPrice: number;
+  proteinTotalGrams?: number;
+  caloriesTotal?: number;
+  isBought: boolean;
+  tacoRef?: string;
+  savingsTip?: string;
+}
+
+export interface EconomicalMealDay {
+  day: string; // "Segunda", "Terça", etc.
+  breakfast: string;
+  lunch: string;
+  snack: string;
+  dinner: string;
+  dailyCostEstimated: number;
+  dailyProteinGrams: number;
+  dailyCalories: number;
+}
+
+export interface WeeklyBudgetPlan {
+  id: string;
+  weeklyBudget: number; // Ex: 150
+  currency: 'BRL' | 'USD';
+  totalEstimatedCost: number;
+  totalSavingsVsBrandNames: number;
+  meals: EconomicalMealDay[];
+  groceryList: GroceryItem[];
+  createdAt: string;
+  aiAdvice: string;
 }
 
 export type DietaryRestriction =

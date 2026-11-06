@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Camera, X, Upload, Barcode, Sparkles, AlertCircle, RefreshCw, CheckCircle2, BookOpen } from 'lucide-react';
+import { Camera, X, Upload, Barcode, Sparkles, AlertCircle, RefreshCw, CheckCircle2, BookOpen, Tag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useWhiteLabel } from '../context/WhiteLabelContext';
 import { ProductScan, ScanCategory } from '../types/nutrition';
@@ -20,6 +20,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [barcodeInput, setBarcodeInput] = useState<string>('');
+  const [shelfPriceInput, setShelfPriceInput] = useState<string>('');
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [scanCategory, setScanCategory] = useState<ScanCategory>('industrializado');
 
@@ -80,6 +81,11 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
       const finalImage = imageB64 || capturedImage || captureFrame() || undefined;
       const finalBarcode = code || barcodeInput || undefined;
 
+      const parsedShelfPrice = shelfPriceInput ? parseFloat(shelfPriceInput.replace(',', '.')) : undefined;
+
+      const savedBudget = localStorage.getItem('snapdiet_weekly_budget');
+      const weeklyBudget = savedBudget ? parseFloat(savedBudget) : 150.00;
+
       const response = await fetch('/api/gemini/analyze-product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -88,6 +94,8 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
           barcode: finalBarcode,
           userRestrictions: profile.dietaryRestrictions,
           scanCategory,
+          shelfPrice: !isNaN(parsedShelfPrice as number) ? parsedShelfPrice : undefined,
+          weeklyBudget,
         }),
       });
 
@@ -162,6 +170,26 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
               {cat === 'industrializado' ? t('modals.scanner.packaged') : t('modals.scanner.meal')}
             </button>
           ))}
+        </div>
+
+        {/* Shelf Price Input / Mercado Barato banner */}
+        <div className="px-3 py-2 bg-amber-50/70 dark:bg-amber-950/30 border-b border-amber-200/60 dark:border-amber-900/40 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <Tag className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+            <span className="text-[11px] font-semibold text-amber-900 dark:text-amber-300 truncate">
+              {t('modals.scanner.shelfPriceLabel', 'Preço na Gôndola:')}
+            </span>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <span className="text-xs font-bold text-amber-700 dark:text-amber-400">R$</span>
+            <input
+              type="text"
+              value={shelfPriceInput}
+              onChange={(e) => setShelfPriceInput(e.target.value)}
+              placeholder="Ex: 14,90"
+              className="w-20 px-2 py-1 text-xs font-mono font-bold bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 rounded-md text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
+            />
+          </div>
         </div>
 
         {/* Camera Viewfinder / Preview */}

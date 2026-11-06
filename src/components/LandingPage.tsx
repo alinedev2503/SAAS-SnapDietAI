@@ -35,6 +35,7 @@ import {
   MapPin,
   Navigation,
   Cloud,
+  PiggyBank,
 } from 'lucide-react';
 import { useWhiteLabel } from '../context/WhiteLabelContext';
 
@@ -118,6 +119,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
             >
               <Camera className="w-5 h-5" />
               <span>{t('landing.hero.scanNow')}</span>
+            </button>
+
+            <button
+              onClick={() => onNavigateToTab('budget')}
+              className="w-full sm:w-auto px-6 py-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-sm rounded-2xl shadow-lg shadow-amber-500/20 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
+            >
+              <PiggyBank className="w-4 h-4 text-slate-950" />
+              <span>{t('landing.hero.budgetCta', 'Mercado Barato · Orçamento')}</span>
             </button>
 
             <button

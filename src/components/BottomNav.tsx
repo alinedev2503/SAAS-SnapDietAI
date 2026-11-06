@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, Home, Calendar, MapPin, User } from 'lucide-react';
+import { Camera, Home, Calendar, PiggyBank, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface BottomNavProps {
@@ -26,13 +26,16 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
         </button>
 
         <button
-          onClick={() => setActiveTab('history')}
-          className={`flex flex-col items-center justify-center min-h-[44px] cursor-pointer transition-colors ${
-            activeTab === 'history' ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-slate-500 dark:text-slate-400'
+          onClick={() => setActiveTab('budget')}
+          className={`flex flex-col items-center justify-center min-h-[44px] cursor-pointer transition-colors relative ${
+            activeTab === 'budget' ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-slate-500 dark:text-slate-400'
           }`}
         >
-          <Calendar className="w-5 h-5" />
-          <span className="text-[10px] tracking-tight mt-0.5">{t('navbar.diary', 'Diário')}</span>
+          <span className="relative">
+            <PiggyBank className="w-5 h-5" />
+            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+          </span>
+          <span className="text-[10px] tracking-tight mt-0.5 font-bold">{t('navbar.cheapMarketShort', 'Mercado')}</span>
         </button>
 
         {/* Central Prominent Camera Button */}
@@ -47,13 +50,13 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, o
         </div>
 
         <button
-          onClick={() => setActiveTab('nutritionists')}
+          onClick={() => setActiveTab('history')}
           className={`flex flex-col items-center justify-center min-h-[44px] cursor-pointer transition-colors ${
-            activeTab === 'nutritionists' ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-slate-500 dark:text-slate-400'
+            activeTab === 'history' ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-slate-500 dark:text-slate-400'
           }`}
         >
-          <MapPin className="w-5 h-5" />
-          <span className="text-[10px] tracking-tight mt-0.5">{t('navbar.nutritionists')}</span>
+          <Calendar className="w-5 h-5" />
+          <span className="text-[10px] tracking-tight mt-0.5">{t('navbar.diary', 'Diário')}</span>
         </button>
 
         <button

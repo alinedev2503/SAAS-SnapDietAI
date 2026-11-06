@@ -104,7 +104,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenS
         >
           <span className="text-2xl">{config.logoEmoji}</span>
           <span className="text-base sm:text-lg md:text-xl font-bold tracking-tight text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-            {config.appName}
+            {config.appName && config.appName !== 'NutriLense AI' ? config.appName : 'SnapDiet'}
           </span>
         </button>
 
@@ -117,6 +117,17 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenS
             }`}
           >
             {t('navbar.home')}
+          </button>
+          <button
+            onClick={() => setActiveTab('budget')}
+            className={`hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'budget' ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : ''
+            }`}
+          >
+            <span className="px-2 py-0.5 text-xs font-bold bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 rounded-lg border border-amber-300/60 dark:border-amber-800/60 flex items-center gap-1">
+              <span>🏷️</span>
+              <span>{t('navbar.cheapMarket', 'Mercado Barato')}</span>
+            </span>
           </button>
           <button
             onClick={() => setActiveTab('history')}
