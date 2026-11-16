@@ -1,6 +1,0 @@
-{
-  "summary": "Plano de implementação para o SnapDiet com o conceito Mercado Barato:\n- Rebranding oficial para SnapDiet em toda a interface, meta tags e configurações.\n- Scanner multimodal de gôndola e rótulos com cálculo em tempo real de preço por 100g e custo por grama de proteína.\n- Nova aba dedicada de Orçamento Semanal e Lista de Compras Inteligente (Budget Meal Planner).\n- Sugestões de substitutos mais baratos e inteligentes no supermercado para combater a inflação alimentar.\n- Integração no servidor backend com Gemini 2.5 Flash / 3.8 Flash e persistência na nuvem/local.",
-  "updatedAt": "2026-11-06T19:39:57.450808400Z",
-  "requestFeedback": true,
-  "userFacing": true
-}
