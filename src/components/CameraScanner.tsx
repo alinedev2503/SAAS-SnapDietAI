@@ -12,7 +12,7 @@ interface CameraScannerProps {
 
 export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, onScanComplete }) => {
   const { t } = useTranslation();
-  const { profile, addScan } = useWhiteLabel();
+  const { profile, addScan, currentPlan, remainingScans, maxFreeTests, canRunScan, openDemoModal } = useWhiteLabel();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -76,6 +76,12 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
   };
 
   const handleAnalyze = async (imageB64?: string, code?: string) => {
+    if (!canRunScan) {
+      onClose();
+      openDemoModal();
+      return;
+    }
+
     setIsAnalyzing(true);
     try {
       const finalImage = imageB64 || capturedImage || captureFrame() || undefined;
@@ -153,6 +159,37 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
           >
             <X className="w-5 h-5" />
           </button>
+        </div>
+
+        {/* Free Trial / Quota Counter Strip */}
+        <div
+          className={`px-4 py-2 border-b flex items-center justify-between gap-2 text-xs font-semibold ${
+            canRunScan
+              ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-200/70 dark:border-emerald-900/50 text-emerald-800 dark:text-emerald-200'
+              : 'bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-200'
+          }`}
+        >
+          <div className="flex items-center gap-1.5 min-w-0">
+            <Sparkles className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">
+              {currentPlan === 'free'
+                ? canRunScan
+                  ? t('modals.scanner.freeTrialRemaining', { remaining: remainingScans, max: maxFreeTests })
+                  : t('modals.scanner.freeTrialExhausted', { max: maxFreeTests })
+                : t('modals.scanner.quotaStatus', { remaining: remainingScans, max: maxFreeTests })}
+            </span>
+          </div>
+          {!canRunScan && (
+            <button
+              onClick={() => {
+                onClose();
+                openDemoModal();
+              }}
+              className="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[11px] font-bold shrink-0 cursor-pointer transition-colors"
+            >
+              {t('modals.scanner.unlockMoreBtn')}
+            </button>
+          )}
         </div>
 
         {/* Mode Selector */}

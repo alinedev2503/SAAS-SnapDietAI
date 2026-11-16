@@ -90,7 +90,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenScanner }) => {
-  const { config, demoScanCount } = useWhiteLabel();
+  const { config, remainingScans, maxFreeTests, canRunScan, currentPlan, openDemoModal } = useWhiteLabel();
   const { t } = useTranslation();
 
   return (
@@ -180,11 +180,38 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenS
             onNavigateToProfile={() => setActiveTab('profile')}
           />
 
-          {/* Scan counter badge */}
-          <span className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-mono text-slate-600 dark:text-slate-400">
-            <Sparkles className="w-3 h-3 text-emerald-500" />
-            {demoScanCount}/{config.demoMaxScans} {t('navbar.scans')}
-          </span>
+          {/* Scan counter badge - always visible so guest test quota is transparent */}
+          <Tooltip
+            content={
+              currentPlan === 'free'
+                ? t('navbar.freeTestsTooltip', { remaining: remainingScans, max: maxFreeTests })
+                : t('navbar.quotaTooltip', { remaining: remainingScans, max: maxFreeTests })
+            }
+          >
+            <button
+              onClick={canRunScan ? onOpenScanner : openDemoModal}
+              className={`inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl text-xs font-mono font-bold border transition-colors cursor-pointer ${
+                canRunScan
+                  ? 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/80'
+                  : 'bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/80'
+              }`}
+              aria-label={
+                currentPlan === 'free'
+                  ? t('navbar.freeTestsBadge', { remaining: remainingScans, max: maxFreeTests })
+                  : `${remainingScans}/${maxFreeTests} ${t('navbar.scans')}`
+              }
+            >
+              <Sparkles className="w-3.5 h-3.5 shrink-0" />
+              <span className="sm:hidden">
+                {remainingScans}/{maxFreeTests}
+              </span>
+              <span className="hidden sm:inline">
+                {currentPlan === 'free'
+                  ? t('navbar.freeTestsBadge', { remaining: remainingScans, max: maxFreeTests })
+                  : `${remainingScans}/${maxFreeTests} ${t('navbar.scans')}`}
+              </span>
+            </button>
+          </Tooltip>
 
           {/* Scan label button: Camera icon only with tooltip */}
           <Tooltip content={t('navbar.scanTooltip', 'Escanear rótulo de produto')}>

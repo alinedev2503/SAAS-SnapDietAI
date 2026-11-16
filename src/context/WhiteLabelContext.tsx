@@ -11,6 +11,9 @@ interface WhiteLabelContextType {
   history: ProductScan[];
   dailyLogs: DailyLog[];
   demoScanCount: number;
+  maxFreeTests: number;
+  remainingScans: number;
+  canRunScan: boolean;
   currentPlan: PlanTier;
   showDemoModal: boolean;
   isLoading: boolean;
@@ -175,7 +178,7 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           planId: plan,
-          customerEmail: profile.email || currentUser?.email || 'contato@nutrilense.ai',
+          customerEmail: profile.email || currentUser?.email || 'contato@snapdiet.app',
           isUS,
         }),
       });
@@ -258,6 +261,10 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
+  const maxFreeTests = currentPlan === 'plus' ? 60 : currentPlan === 'pro' ? 20 : 2;
+  const remainingScans = Math.max(0, maxFreeTests - demoScanCount);
+  const canRunScan = demoScanCount < maxFreeTests;
+
   return (
     <WhiteLabelContext.Provider
       value={{
@@ -266,6 +273,9 @@ export const WhiteLabelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         history,
         dailyLogs,
         demoScanCount,
+        maxFreeTests,
+        remainingScans,
+        canRunScan,
         currentPlan,
         showDemoModal,
         isLoading,

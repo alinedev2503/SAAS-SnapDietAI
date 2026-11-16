@@ -52,6 +52,12 @@ O aplicativo estará disponível em `http://localhost:3000`.
 
 ---
 
+## 📚 Documentação Completa
+
+Consulte o arquivo **[`DOCUMENTACAO.md`](./DOCUMENTACAO.md)** na raiz do projeto para o guia completo do produto (**SnapDiet / Mercado Barato**), detalhes do modo de **2 acessos gratuitos sem login**, análise nutricional completa (macros, vitaminas, minerais, alergênicos e Tabela TACO), arquitetura técnica e referência de endpoints de API.
+
+---
+
 ## 📦 Licença e Comercialização
 
 Este projeto está pronto para comercialização como:
@@ -59,4 +65,4 @@ Este projeto está pronto para comercialização como:
 - **SaaS White-Label**;
 - **Aplicativo Mobile PWA** pronto para publicação na Google Play Store.
 
-Consulte a documentação em `/docs/` para obter detalhes arquiteturais e orientações de deploy.
+Consulte também `/docs/` para detalhes de prontidão para lojas.

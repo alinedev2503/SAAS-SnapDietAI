@@ -46,7 +46,7 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavigateToTab }) => {
   const { t } = useTranslation();
-  const { config, currentPlan, setPlan, subscribeStripePlan } = useWhiteLabel();
+  const { config, currentPlan, remainingScans, maxFreeTests, canRunScan, setPlan, subscribeStripePlan } = useWhiteLabel();
 
   // Interactive comparison widget state
   const [activeDemo, setActiveDemo] = useState<'soda' | 'yogurt'>('soda');
@@ -137,6 +137,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenScanner, onNavig
               <span>{t('landing.hero.viewReport')}</span>
             </button>
           </div>
+
+          {/* Free Trial Counter Strip (2 free accesses without login or purchase) */}
+          {currentPlan === 'free' && (
+            <div className="pt-1 flex justify-center">
+              <div
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-semibold ${
+                  canRunScan
+                    ? 'bg-emerald-50/90 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                    : 'bg-amber-50/90 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                <span>
+                  {canRunScan
+                    ? t('landing.hero.freeTrialRemaining', { remaining: remainingScans, max: maxFreeTests })
+                    : t('landing.hero.freeTrialExhausted', { max: maxFreeTests })}
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Quick Feature Badges */}
           <div className="pt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 dark:text-slate-400 font-medium">
