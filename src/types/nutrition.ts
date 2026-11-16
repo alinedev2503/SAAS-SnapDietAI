@@ -64,7 +64,14 @@ export interface TacoValidation {
   discrepancies?: string[];
 }
 
-export type ScanCategory = 'industrializado' | 'prato_pronto';
+export interface MicronutrientItem {
+  name: string;
+  amount: string;
+  dailyValuePercent?: string;
+  type: 'vitamin' | 'mineral';
+}
+
+export type ScanCategory = 'industrializado' | 'prato_pronto' | 'alimento';
 
 export interface ProductScan {
   id: string;
@@ -90,10 +97,12 @@ export interface ProductScan {
   novaGroup: 1 | 2 | 3 | 4;
   novaDescription: string;
   macronutrients: Macronutrients;
+  vitaminsAndMinerals?: MicronutrientItem[];
   ingredientsText: string;
   beneficialSubstances: BeneficialSubstance[];
   harmfulSubstances: HarmfulSubstance[];
   additives: string[];
+  allergens?: string[];
   triggeredAlerts: string[];
   suggestedSwaps: SuggestedSwap[];
   scannedAt: string; // ISO string date

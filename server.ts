@@ -116,6 +116,12 @@ const SAMPLE_PRODUCTS: Record<string, any> = {
       sugar: 5,
     },
     ingredientsText: 'Leite desnatado pasteurizado, fermentos lácteos vivos e concentração proteica de soro de leite.',
+    vitaminsAndMinerals: [
+      { name: 'Cálcio', amount: '314 mg', dailyValuePercent: '31%', type: 'mineral' },
+      { name: 'Vitamina B12', amount: '0.9 µg', dailyValuePercent: '38%', type: 'vitamin' },
+      { name: 'Vitamina B2 (Riboflavina)', amount: '0.4 mg', dailyValuePercent: '31%', type: 'vitamin' },
+      { name: 'Fósforo', amount: '230 mg', dailyValuePercent: '33%', type: 'mineral' },
+    ],
     beneficialSubstances: [
       { name: 'Proteína de Alta Absorção (TACO)', reason: 'Essencial para ganho de massa magra e reconstrução muscular.' },
       { name: 'Probióticos Vivos Lácteos', reason: 'Melhora a flora intestinal e imunidade.' },
@@ -123,6 +129,7 @@ const SAMPLE_PRODUCTS: Record<string, any> = {
     ],
     harmfulSubstances: [],
     additives: [],
+    allergens: ['Leite e derivados (Lactose)', 'Proteína do soro do leite'],
     triggeredAlerts: [],
     suggestedSwaps: [],
   },
@@ -148,6 +155,10 @@ const SAMPLE_PRODUCTS: Record<string, any> = {
       sugar: 0,
     },
     ingredientsText: 'Água gaseificada, extrato de noz de cola, corante caramelo IV (E150d), acidulante ácido fosfórico (E338), edulcorantes artificiais sucralose e acessulfame K, conservador benzoato de sódio (E211).',
+    vitaminsAndMinerals: [
+      { name: 'Fósforo (via Ácido Fosfórico)', amount: '52 mg', dailyValuePercent: '7%', type: 'mineral' },
+      { name: 'Sódio', amount: '48 mg', dailyValuePercent: '2%', type: 'mineral' },
+    ],
     beneficialSubstances: [],
     harmfulSubstances: [
       { name: 'Corante Caramelo IV (E150d)', risk: 'Alto', description: 'Aditivo sintético de alta preocupação toxicológica.' },
@@ -155,6 +166,7 @@ const SAMPLE_PRODUCTS: Record<string, any> = {
       { name: 'Adoçantes Artificiais (Sucralose e Acessulfame K)', risk: 'Médio', description: 'Alteração da microbiota intestinal e sensibilidade à insulina.' },
     ],
     additives: ['E150d', 'E338', 'E211'],
+    allergens: ['Sulfitos (traços possíveis via corante caramelo IV)'],
     triggeredAlerts: ['Aditivos Nocivos Elevados', 'Ultraprocessado NOVA 4'],
     suggestedSwaps: [
       { productName: 'Água com Gás e Limão Natural', brand: 'Fonte Puríssima', healthScore: 98, nutriScore: 'A', reason: 'Zero aditivos químicos, hidratação natural e vitamina C.' },
@@ -536,58 +548,55 @@ app.post('/api/gemini/analyze-product', async (req, res) => {
     }
 
     const weeklyBudget = Number(req.body.weeklyBudget || req.body.tetoGastosSemanal || 150.00);
-
-    // Injeta a base oficial de dados da Tabela TACO (NEPA/UNICAMP) no prompt
     const tacoContextPrompt = buildTacoContextPrompt();
 
-    const systemInstruction = `Você é o motor de inteligência artificial do 'SnapDiet / Mercado Barato', um assistente especializado em proteção financeira e inteligência de compras para o consumidor no Brasil.
-Sua missão principal NÃO é focar em restrição de dieta sofisticada, mas sim em ECONOMIA DOMÉSTICA, custo-benefício por 100g/ml, tradução de ingredientes ocultos e alternativas baratas de mercado.
+    const scanTargetLabel =
+      scanCategory === 'prato_pronto'
+        ? 'prato de refeição pronto (caseiro ou de restaurante)'
+        : scanCategory === 'alimento'
+        ? 'alimento individual / in natura (fruta, legume, carne, ovo, grão, etc.)'
+        : 'produto industrializado (rótulo nutricional e lista de ingredientes)';
 
-Ao receber a imagem de um rótulo ou produto e o teto de gastos do usuário:
-1. Identifique o produto e estime/calcule o preço padrão de mercado por 100g ou unidade equivalente.
-2. Aponte se há aditivos químicos excessivos ou se o produto é superfaturado pela marca.
-3. Sugira uma alternativa caseira ou de marca mais barata que cumpra o mesmo papel na despensa.
-4. Avalie o impacto no orçamento semanal informado.
+    const systemInstruction = `Você é o motor de inteligência nutricional e econômica do 'SnapDiet / Mercado Barato'.
+Sua missão possui dois pilares inseparáveis:
+1. ANÁLISE NUTRICIONAL COMPLETA (Base do App): Analisar minuciosamente rótulos de produtos, fotos de refeições prontas e fotos de alimentos avulsos, entregando com precisão baseada na Tabela TACO (NEPA/UNICAMP):
+   - Calorias, carboidratos, gorduras (totais, saturadas e trans), proteínas, fibras e sódio;
+   - Vitaminas e minerais relevantes presentes no alimento/prato/rótulo;
+   - Substâncias benéficas à saúde e substâncias/aditivos que podem causar malefícios;
+   - Substâncias alergênicas (leite/lactose, glúten/trigo, soja, amendoim, castanhas, ovos, peixes, crustáceos, sulfitos) e incompatibilidades com as restrições do usuário.
+2. ECONOMIA DOMÉSTICA ("MERCADO BARATO"): Estimar/calcular custo-benefício por 100g e por grama de proteína, identificar superfaturamento de marca, sugerir alternativas mais baratas/caseiras e avaliar o impacto no teto semanal de gastos.
 
-Mantenha a resposta estritamente estruturada em JSON (sem rodeios médicos ou acadêmicos, use linguagem popular e direta).`;
+Mantenha a resposta estritamente estruturada em JSON válido.`;
 
-    const promptText = `Analise a foto deste produto anexada ${barcode ? `(código de barras EAN: "${barcode}")` : ''}.
+    const promptText = `Analise a foto deste ${scanTargetLabel} ${barcode ? `(ou código de barras EAN: "${barcode}")` : ''}.
 O teto de gastos semanal atual do usuário é de R$ ${weeklyBudget.toFixed(2)}.
 ${req.body.shelfPrice ? `O usuário informou que o preço na gôndola é R$ ${Number(req.body.shelfPrice).toFixed(2)}. Utilize este valor real para calcular o preço por 100g e por grama de proteína.` : 'Se houver etiqueta de preço visível na gôndola/foto, extraia o preço. Se não houver, estime um preço de mercado realista no varejo brasileiro (R$).'}
 
-Retorne a análise contendo:
-- Nome do Produto e Categoria.
-- Custo-benefício aproximado (Preço por 100g).
-- Alerta de economia (Vale a pena ou é desperdício de dinheiro? Superfaturado pela marca?).
-- Sugestão de substituição mais barata ou caseira.
-- Avaliação do impacto no orçamento semanal informado de R$ ${weeklyBudget.toFixed(2)}.
-
 ${tacoContextPrompt}
 
-PROTOCOLO DE AUDITORIA DUPLA OBRIGATÓRIO:
-1. EXTRAÇÃO PRIMÁRIA: Leia atentamente os dados visíveis no rótulo da embalagem (marca, porção, calorias, macronutrientes declarados, lista legível de ingredientes, alérgenos e aditivos).
-2. VALIDAÇÃO SECUNDÁRIA (AUDITORIA CIENTÍFICA TACO):
-   - Utilize a Tabela TACO (NEPA/UNICAMP 4ª Edição) fornecida acima como sua referência analítica e biológica de controle.
-   - Encontre o alimento base correspondente na TACO (ex: Iogurte natural, Aveia em flocos, Peito de frango, Arroz integral, Biscoito, Refrigerante, etc.).
-   - Normalize os macronutrientes para a base de 100g e compare com os valores laboratoriais da TACO.
-   - Audite se há excesso de sódio artificial (+150% do alimento base), se faltam fibras para alimentos que se dizem integrais, ou se há açúcares ocultos camuflados.
-   - Defina o campo "validationStatus": "conforme" | "divergente" | "alerta".
-
-As restrições alimentares do usuário são: [${userRestrictions.join(', ')}].
+PROTOCOLO DE ANÁLISE NUTRICIONAL & AUDITORIA TACO OBRIGATÓRIO:
+1. EXTRAÇÃO & IDENTIFICAÇÃO COMPLETA:
+   - Se for rótulo: leia marca, porção, calorias, carboidratos, proteínas, gorduras (totais, saturadas, trans), fibras, sódio, vitaminas, minerais, ingredientes, aditivos e alergênicos declarados.
+   - Se for foto de refeição ou foto de alimento: estime os ingredientes/alimentos presentes, o peso da porção, calorias, carboidratos, gorduras, proteínas, principais vitaminas e minerais, substâncias benéficas, potenciais malefícios (ex: excesso de fritura, sódio ou açúcar) e possíveis alergênicos ocultos.
+2. VALIDAÇÃO CIENTÍFICA TACO (NEPA/UNICAMP 4ª Edição):
+   - Encontre o alimento base correspondente na TACO, normalize para 100g e defina "validationStatus": "conforme" | "divergente" | "alerta".
+3. SUBSTÂNCIAS ALERGÊNICAS & RESTRIÇÕES:
+   - Liste todos os alergênicos identificados ou prováveis em "allergens" (ex: ["Leite e derivados", "Glúten", "Soja"]). Se não houver, retorne [].
+   - Restrições ativas do usuário: [${userRestrictions.join(', ')}]. Se houver violação ou risco, adicione imediatamente a "triggeredAlerts".
 
 Forneça uma resposta estritamente em formato JSON com o seguinte esquema preciso:
 {
-  "productName": "Nome do Alimento ou Bebida",
-  "brand": "Marca do fabricante (ou 'In Natura / Preparado')",
+  "productName": "Nome do Alimento, Prato ou Produto",
+  "brand": "Marca do fabricante (ou 'In Natura / Refeição Caseira')",
   "barcode": "${barcode || ''}",
-  "servingSize": "Tamanho da porção (ex: 100g ou 1 porção de 30g)",
+  "servingSize": "Tamanho da porção (ex: 100g, 1 prato de 350g, ou 1 unidade de 130g)",
   "price": 14.90,
   "packageWeightGrams": 200,
   "pricePer100g": 7.45,
   "pricePerProteinGram": 0.74,
   "economicVerdict": "Vale a pena" ou "Desperdício de dinheiro / Superfaturado",
-  "economicAlert": "Texto popular e direto explicando se vale a pena comprar ou se é superfaturado pela marca",
-  "homemadeSwap": "Sugestão prática de alternativa caseira ou de marca própria mais barata que cumpre o mesmo papel na despensa",
+  "economicAlert": "Texto direto explicando o custo-benefício ou superfaturamento",
+  "homemadeSwap": "Sugestão prática de alternativa caseira ou marca mais barata",
   "budgetImpactAnalysis": "Impacto percentual e financeiro no teto semanal de R$ ${weeklyBudget.toFixed(2)}",
   "cheaperSwaps": [
     {
@@ -599,7 +608,7 @@ Forneça uma resposta estritamente em formato JSON com o seguinte esquema precis
       "savingsAmount": 8.10,
       "proteinPerServing": 22,
       "nutriScore": "A",
-      "reason": "Por que esta opção economiza dinheiro e mantém ou eleva as proteínas"
+      "reason": "Por que esta opção economiza dinheiro e mantém ou eleva a nutrição"
     }
   ],
   "tacoReference": "TACO #ID - Nome do Alimento (NEPA/UNICAMP 4ª Edição)",
@@ -616,7 +625,7 @@ Forneça uma resposta estritamente em formato JSON com o seguinte esquema precis
       "sodium": 5
     },
     "validationStatus": "conforme",
-    "auditNotes": "Texto técnico da auditoria secundária comparando o produto com a referência laboratorial da UNICAMP",
+    "auditNotes": "Texto técnico da auditoria comparando o item com a referência da UNICAMP",
     "discrepancies": ["Lista de alertas de divergência se houver"]
   },
   "healthScore": 85,
@@ -634,24 +643,30 @@ Forneça uma resposta estritamente em formato JSON com o seguinte esquema precis
     "sodium": 120,
     "sugar": 3.2
   },
-  "ingredientsText": "Lista legível completa dos ingredientes identificados no rótulo ou no prato",
+  "vitaminsAndMinerals": [
+    { "name": "Vitamina C", "amount": "45 mg", "dailyValuePercent": "50%", "type": "vitamin" },
+    { "name": "Ferro", "amount": "2.4 mg", "dailyValuePercent": "17%", "type": "mineral" }
+  ],
+  "ingredientsText": "Lista completa dos ingredientes identificados no rótulo, refeição ou alimento",
   "beneficialSubstances": [
     { "name": "Nome da substância saudável", "reason": "Benefício à saúde fundamentado" }
   ],
   "harmfulSubstances": [
-    { "name": "Nome do ingrediente nocivo", "risk": "Alto", "description": "Por que é prejudicial" }
+    { "name": "Nome da substância ou aditivo prejudicial", "risk": "Alto", "description": "Malefício potencial à saúde" }
   ],
   "additives": ["E621", "E250"],
+  "allergens": ["Leite e derivados", "Glúten"],
   "triggeredAlerts": ["Alerta de Restrição ou Perigo"],
   "suggestedSwaps": [
-    { "productName": "Nome de produto substituto mais saudável", "brand": "Marca Sugerida", "healthScore": 95, "nutriScore": "A", "reason": "Por que esta opção é superior" }
+    { "productName": "Nome de substituto mais saudável", "brand": "Marca Sugerida", "healthScore": 95, "nutriScore": "A", "reason": "Por que esta opção é superior" }
   ]
 }
 
 Regras estritas:
 1. Responda APENAS o JSON válido sem blocos markdown adicionais.
-2. Identifique 'açúcares escondidos' (maltodextrina, dextrose, xarope de milho de alta frutose, sacarose, açúcar invertido).
-3. Se violar as restrições informadas (${userRestrictions.join(', ')}), adicione imediatamente aos triggeredAlerts.`;
+2. Sempre preencha "vitaminsAndMinerals" com pelo menos 2 a 5 vitaminas e minerais relevantes para o alimento/refeição/rótulo.
+3. Identifique 'açúcares escondidos' e todas as substâncias alergênicas em "allergens".
+4. Se violar as restrições informadas (${userRestrictions.join(', ')}), adicione imediatamente aos triggeredAlerts.`;
 
     let parts: any[] = [{ text: promptText }];
 
@@ -793,6 +808,17 @@ function generateFallbackAnalysis(barcode?: string, userRestrictions: string[] =
     novaDescription: isHealthy ? 'Processado leve' : 'Ultraprocessado com aditivos',
     servingSize,
     macronutrients,
+    vitaminsAndMinerals: isHealthy
+      ? [
+          { name: 'Magnésio', amount: '62 mg', dailyValuePercent: '15%', type: 'mineral' },
+          { name: 'Ferro', amount: '1.8 mg', dailyValuePercent: '13%', type: 'mineral' },
+          { name: 'Vitamina B1 (Tiamina)', amount: '0.25 mg', dailyValuePercent: '21%', type: 'vitamin' },
+          { name: 'Vitamina E', amount: '2.1 mg', dailyValuePercent: '14%', type: 'vitamin' },
+        ]
+      : [
+          { name: 'Ferro (enriquecimento)', amount: '1.4 mg', dailyValuePercent: '10%', type: 'mineral' },
+          { name: 'Vitamina B9 (Ácido Fólico)', amount: '42 µg', dailyValuePercent: '11%', type: 'vitamin' },
+        ],
     ingredientsText,
     beneficialSubstances: isHealthy
       ? [
@@ -807,6 +833,9 @@ function generateFallbackAnalysis(barcode?: string, userRestrictions: string[] =
           { name: 'Xarope de Milho de Alta Frutose (Açúcar Escondido)', risk: 'Alto', description: 'Açúcar de rápida absorção associado à esteatose hepática.' },
         ],
     additives: isHealthy ? [] : ['E150d', 'E322', 'E202'],
+    allergens: isHealthy
+      ? ['Oleaginosas (Castanha-de-caju)', 'Aveia (pode conter traços de glúten)']
+      : ['Glúten (Farinha de Trigo)', 'Soja (Lecitina)', 'Pode conter leite e amendoim'],
     triggeredAlerts: alerts,
     suggestedSwaps: [
       {

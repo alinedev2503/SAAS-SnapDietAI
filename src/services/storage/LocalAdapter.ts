@@ -51,12 +51,19 @@ const SAMPLE_SCANS: ProductScan[] = [
       sugar: 5,
     },
     ingredientsText: 'Leite desnatado pasteurizado, fermentos lácteos vivos e concentração proteica de soro de leite.',
+    vitaminsAndMinerals: [
+      { name: 'Cálcio', amount: '314 mg', dailyValuePercent: '31%', type: 'mineral' },
+      { name: 'Vitamina B12', amount: '0.9 µg', dailyValuePercent: '38%', type: 'vitamin' },
+      { name: 'Vitamina B2 (Riboflavina)', amount: '0.4 mg', dailyValuePercent: '31%', type: 'vitamin' },
+      { name: 'Fósforo', amount: '230 mg', dailyValuePercent: '33%', type: 'mineral' }
+    ],
     beneficialSubstances: [
       { name: 'Proteínas Vivas', reason: 'Ganho muscular e reparação tecidual' },
       { name: 'Cálcio Ativo', reason: 'Densidade óssea saudável' }
     ],
     harmfulSubstances: [],
     additives: [],
+    allergens: ['Leite e derivados (Lactose)', 'Proteína do soro do leite'],
     triggeredAlerts: ['CONTÉM LACTOSE - Incompatível com seu perfil'],
     suggestedSwaps: [],
     cheaperSwaps: [
@@ -102,12 +109,17 @@ const SAMPLE_SCANS: ProductScan[] = [
       sugar: 0,
     },
     ingredientsText: 'Água gaseificada, extrato de noz de cola, corante caramelo IV (E150d), acidulante ácido fosfórico (E338), sucralose.',
+    vitaminsAndMinerals: [
+      { name: 'Fósforo (via Ácido Fosfórico)', amount: '52 mg', dailyValuePercent: '7%', type: 'mineral' },
+      { name: 'Sódio', amount: '48 mg', dailyValuePercent: '2%', type: 'mineral' }
+    ],
     beneficialSubstances: [],
     harmfulSubstances: [
       { name: 'Corante Caramelo IV (E150d)', risk: 'Alto', description: 'Aditivo sintético de alta preocupação toxicológica' },
       { name: 'Ácido Fosfórico (E338)', risk: 'Médio', description: 'Desgaste de cálcio nos ossos' }
     ],
     additives: ['E150d', 'E338', 'E211'],
+    allergens: ['Sulfitos (traços possíveis via corante caramelo IV)'],
     triggeredAlerts: ['ALTO EM ADITIVOS SINTÉTICOS', 'ULTRAPROCESSADO NOVA 4'],
     suggestedSwaps: [
       { productName: 'Kombucha Orgânica de Gengibre', brand: 'BioFlora', healthScore: 88, nutriScore: 'A', reason: 'Probiótico natural gaseificado sem conservantes' }

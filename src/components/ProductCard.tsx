@@ -289,43 +289,89 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
       </div>
 
       {/* Macronutrients Grid */}
-      <div className="p-5 border-b border-slate-100 dark:border-slate-800">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
-          <Flame className="w-4 h-4 text-amber-500" />
-          {t('productCard.nutritionTitle')}
-        </h4>
+      <div className="p-5 border-b border-slate-100 dark:border-slate-800 space-y-4">
+        <div>
+          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+            <Flame className="w-4 h-4 text-amber-500" />
+            {t('productCard.nutritionTitle')}
+          </h4>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          
-          <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-center">
-            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">{t('productCard.calories')}</span>
-            <span className="text-base font-bold font-mono text-slate-900 dark:text-white">
-              {scan.macronutrients.calories} <span className="text-xs font-normal text-slate-500">kcal</span>
-            </span>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+            <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-center">
+              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">{t('productCard.calories')}</span>
+              <span className="text-base font-bold font-mono text-slate-900 dark:text-white">
+                {scan.macronutrients.calories} <span className="text-xs font-normal text-slate-500">kcal</span>
+              </span>
+            </div>
+
+            <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-center">
+              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">{t('productCard.carbs')}</span>
+              <span className="text-base font-bold font-mono text-slate-900 dark:text-white">
+                {scan.macronutrients.carbohydrates}g
+              </span>
+            </div>
+
+            <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-center">
+              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">{t('productCard.protein')}</span>
+              <span className="text-base font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                {scan.macronutrients.protein}g
+              </span>
+            </div>
+
+            <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-center">
+              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">{t('productCard.fat', 'Gorduras')}</span>
+              <span className="text-base font-bold font-mono text-slate-900 dark:text-white">
+                {scan.macronutrients.totalFat}g
+              </span>
+            </div>
+
+            <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-center">
+              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">{t('productCard.fiber', 'Fibras')}</span>
+              <span className="text-base font-bold font-mono text-slate-900 dark:text-white">
+                {scan.macronutrients.dietaryFiber}g
+              </span>
+            </div>
+
+            <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-center">
+              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">{t('productCard.sodium')}</span>
+              <span className="text-base font-bold font-mono text-slate-900 dark:text-white">
+                {scan.macronutrients.sodium}mg
+              </span>
+            </div>
           </div>
-
-          <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-center">
-            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">{t('productCard.protein')}</span>
-            <span className="text-base font-bold font-mono text-emerald-600 dark:text-emerald-400">
-              {scan.macronutrients.protein}g
-            </span>
-          </div>
-
-          <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-center">
-            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">{t('productCard.carbs')}</span>
-            <span className="text-base font-bold font-mono text-slate-900 dark:text-white">
-              {scan.macronutrients.carbohydrates}g
-            </span>
-          </div>
-
-          <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-center">
-            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 block">{t('productCard.sodium')}</span>
-            <span className="text-base font-bold font-mono text-slate-900 dark:text-white">
-              {scan.macronutrients.sodium}mg
-            </span>
-          </div>
-
         </div>
+
+        {/* Vitamins & Minerals Breakdown */}
+        {scan.vitaminsAndMinerals && scan.vitaminsAndMinerals.length > 0 && (
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+            <h5 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 flex items-center gap-1.5">
+              <HeartPulse className="w-3.5 h-3.5 text-emerald-600" />
+              {t('productCard.vitaminsMineralsTitle', 'Vitaminas e Minerais')}
+            </h5>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {scan.vitaminsAndMinerals.map((micro, idx) => (
+                <div
+                  key={idx}
+                  className="px-2.5 py-2 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40"
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="text-[10px] font-bold text-emerald-900 dark:text-emerald-200 truncate">
+                      {micro.name}
+                    </span>
+                    {micro.dailyValuePercent && (
+                      <span className="text-[9px] font-mono font-bold text-emerald-700 dark:text-emerald-400 shrink-0">
+                        {micro.dailyValuePercent} {t('productCard.dailyValue', 'VD')}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs font-mono font-semibold text-slate-700 dark:text-slate-300 block mt-0.5">
+                    {micro.amount}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* TACO Scientific Audit Panel */}
@@ -635,6 +681,30 @@ export const ProductCard: React.FC<ProductCardProps> = ({ scan, onOpenSwaps, onD
             </div>
           ) : (
             <p className="text-xs text-emerald-600 font-medium">{t('productCard.freeOfHarmful')}</p>
+          )}
+        </div>
+
+        {/* Allergenic Substances Section */}
+        <div className="md:col-span-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-400 mb-2">
+            <ShieldAlert className="w-4 h-4 text-amber-600" />
+            <span>{t('productCard.allergensTitle', 'Substâncias Alergênicas:')}</span>
+          </div>
+          {scan.allergens && scan.allergens.length > 0 ? (
+            <div className="flex flex-wrap gap-1.5">
+              {scan.allergens.map((allergen, idx) => (
+                <span
+                  key={idx}
+                  className="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border border-amber-200/80 dark:border-amber-800/60 rounded-lg text-[11px] font-semibold"
+                >
+                  {allergen}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {t('productCard.noAllergens', 'Nenhuma substância alergênica comum identificada.')}
+            </p>
           )}
         </div>
 

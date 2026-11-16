@@ -157,17 +157,21 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
 
         {/* Mode Selector */}
         <div className="flex p-2 gap-2 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
-          {(['industrializado', 'prato_pronto'] as ScanCategory[]).map((cat) => (
+          {(['industrializado', 'prato_pronto', 'alimento'] as ScanCategory[]).map((cat) => (
             <button
               key={cat}
               onClick={() => setScanCategory(cat)}
-              className={`flex-1 py-2 text-xs font-bold rounded-lg capitalize transition-colors ${
+              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                 scanCategory === cat
                   ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300'
                   : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
-              {cat === 'industrializado' ? t('modals.scanner.packaged') : t('modals.scanner.meal')}
+              {cat === 'industrializado'
+                ? t('modals.scanner.packaged')
+                : cat === 'prato_pronto'
+                ? t('modals.scanner.meal')
+                : t('modals.scanner.wholeFood', 'Alimento')}
             </button>
           ))}
         </div>
@@ -247,7 +251,12 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ isOpen, onClose, o
               <Sparkles className="w-4 h-4" />
               <span>
                 {t('modals.scanner.analyzeNow', {
-                  category: scanCategory === 'industrializado' ? t('modals.scanner.label') : t('modals.scanner.dish'),
+                  category:
+                    scanCategory === 'industrializado'
+                      ? t('modals.scanner.label')
+                      : scanCategory === 'prato_pronto'
+                      ? t('modals.scanner.dish')
+                      : t('modals.scanner.food', 'Alimento'),
                 })}
               </span>
             </button>
